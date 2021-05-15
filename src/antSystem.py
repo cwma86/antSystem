@@ -8,7 +8,7 @@ from TspGraphReader import TspGraphReader
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 
 def args():
-  defaultFilePath = os.path.join(script_path, '../TSPData/pla85900.tsp')
+  defaultFilePath = os.path.join(script_path, '../TSPData/pcb1173.tsp')
   parser = argparse.ArgumentParser(description='Run Ant System')   
   parser.add_argument('--filename', default=defaultFilePath, type=str,
                       help='file path of tsp data')

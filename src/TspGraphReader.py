@@ -1,6 +1,8 @@
 import logging
 import os
 
+from Environment import Environment
+
 class TspGraphReader:
     def __init__(self, filename):
         # initialize required vars
@@ -35,6 +37,11 @@ class TspGraphReader:
                     return
                 currentLine = file.readline()
                 count = count + 1
+        environment = Environment(self.foodSources)
+        trails = environment.explore()
+
+        sortedTrails = sorted(trails.values())
+        print(sortedTrails)
 
         # Print out the vertices
         self.print_foodSources()

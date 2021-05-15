@@ -22,39 +22,39 @@ class TestTspGraphReader(unittest.TestCase):
     self.assertEqual(tspGraph, None)
 
   def test_validInputFile(self):
-    testFilename = os.path.join(script_path, '../TSPData/pla85900.tsp')
+    testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
     tspGraph = TspGraphReader(filename=testFilename)
     self.assertNotEqual(tspGraph, None)
 
   def test_validHeaderParse(self):
-    testFilename = os.path.join(script_path, '../TSPData/pla85900.tsp')
+    testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
     tspGraph = TspGraphReader(filename=testFilename)
-    self.assertEqual(tspGraph.graphName, "pla85900")
-    self.assertEqual(tspGraph.graphComment, "Programmed logic array (Johnson)")
+    self.assertEqual(tspGraph.graphName, "pcb10")
+    self.assertEqual(tspGraph.graphComment, "Drilling problem (Juenger/Reinelt)")
     self.assertEqual(tspGraph.graphType, "TSP")
-    self.assertEqual(tspGraph.edgeType, "CEIL_2D")
-    self.assertEqual(tspGraph.dimension, 85900)
+    self.assertEqual(tspGraph.edgeType, "EUC_2D")
+    self.assertEqual(tspGraph.dimension, 10)
 
   def test_validDataParse(self):
-    testFilename = os.path.join(script_path, '../TSPData/pla85900.tsp')
+    testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
     tspGraph = TspGraphReader(filename=testFilename)
     # Check length
-    self.assertEqual(len(tspGraph.foodSources), 85900)
+    self.assertEqual(len(tspGraph.foodSources), 10)
 
     # Check first row
     self.assertEqual(tspGraph.foodSources[0][0], 1)
-    self.assertAlmostEqual(tspGraph.foodSources[0][1], 1449000.0)
-    self.assertAlmostEqual(tspGraph.foodSources[0][2], 672250.0)
+    self.assertAlmostEqual(tspGraph.foodSources[0][1], 2.01700e+03)
+    self.assertAlmostEqual(tspGraph.foodSources[0][2], 6.63000e+02)
 
     # Check middle row
-    self.assertEqual(tspGraph.foodSources[42513][0], 42514)
-    self.assertAlmostEqual(tspGraph.foodSources[42513][1], 867250.0)
-    self.assertAlmostEqual(tspGraph.foodSources[42513][2], 965300.0)
+    self.assertEqual(tspGraph.foodSources[4][0], 5)
+    self.assertAlmostEqual(tspGraph.foodSources[4][1],  2.01600e+03)
+    self.assertAlmostEqual(tspGraph.foodSources[4][2], 8.17000e+02)
 
     # Check last row
-    self.assertEqual(tspGraph.foodSources[85899][0], 85900)
-    self.assertAlmostEqual(tspGraph.foodSources[85899][1], 1339150.0)
-    self.assertAlmostEqual(tspGraph.foodSources[85899][2], 682900.0)
+    self.assertEqual(tspGraph.foodSources[9][0], 10)
+    self.assertAlmostEqual(tspGraph.foodSources[9][1], 1.96300e+03)
+    self.assertAlmostEqual(tspGraph.foodSources[9][2], 8.77000e+02)
 
 if __name__ == '__main__':
 
