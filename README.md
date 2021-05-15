@@ -16,7 +16,7 @@ for the help menu
 ./src/antSystem.py -h
 ```
 
-for processing the default file 'pla85900.tsp'
+for processing the default file 'TSPData/pcb1173.tsp'
 ```bash
 ./src/antSystem.py
 ```
