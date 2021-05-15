@@ -3,7 +3,7 @@ import argparse
 import logging
 import os
 import sys
-from TspGraphReader import TspGraphReader
+from TspGraph import TspGraph
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 
@@ -32,9 +32,9 @@ def args():
 
 
 def main(inputargs):
-  tspGraph = TspGraphReader(filename=inputargs.filename)
+  tspGraph = TspGraph(filename=inputargs.filename)
   if tspGraph == None:
-    logging.error(f"Failed to construct TspGraphReader")
+    logging.error(f"Failed to construct TspGraph")
     sys.exit(1)
 
 

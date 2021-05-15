@@ -7,7 +7,7 @@ import unittest
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 src_dir = os.path.join(script_path, "../src")
 sys.path.insert(1, src_dir)
-from TspGraphReader import TspGraphReader
+from TspGraph import TspGraph
 
 logging.basicConfig(
             format='%(asctime)s,%(msecs)d %(levelname)-8s\
@@ -15,20 +15,20 @@ logging.basicConfig(
             datefmt='%Y-%m-%d:%H:%M:%S',
             level=logging.INFO)
 
-class TestTspGraphReader(unittest.TestCase):
+class TestTspGraph(unittest.TestCase):
   def test_invalidInputFile(self):
     testFilename = "aksdf"
-    tspGraph = TspGraphReader(filename=testFilename)
+    tspGraph = TspGraph(filename=testFilename)
     self.assertEqual(tspGraph, None)
 
   def test_validInputFile(self):
     testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
-    tspGraph = TspGraphReader(filename=testFilename)
+    tspGraph = TspGraph(filename=testFilename)
     self.assertNotEqual(tspGraph, None)
 
   def test_validHeaderParse(self):
     testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
-    tspGraph = TspGraphReader(filename=testFilename)
+    tspGraph = TspGraph(filename=testFilename)
     self.assertEqual(tspGraph.graphName, "pcb10")
     self.assertEqual(tspGraph.graphComment, "Drilling problem (Juenger/Reinelt)")
     self.assertEqual(tspGraph.graphType, "TSP")
@@ -37,7 +37,7 @@ class TestTspGraphReader(unittest.TestCase):
 
   def test_validDataParse(self):
     testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
-    tspGraph = TspGraphReader(filename=testFilename)
+    tspGraph = TspGraph(filename=testFilename)
     # Check length
     self.assertEqual(len(tspGraph.foodSources), 10)
 

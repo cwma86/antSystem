@@ -34,7 +34,7 @@ make check
 ```
 or
 ```bash
-./test/TestTspGraphReader.py
+./test/TestTspGraph.py
 ```
 
 

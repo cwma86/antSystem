@@ -3,7 +3,7 @@ import os
 
 from Environment import Environment
 
-class TspGraphReader:
+class TspGraph:
     def __init__(self, filename):
         # initialize required vars
         self.graphName='', 
@@ -89,6 +89,7 @@ class TspGraphReader:
                 self.edgeType = lineContent
         return file, currentLine
 
+    # TODO This would probably make more sense as a to_string function 
     def print_header(self):
         logging.debug(f"graphName: {self.graphName}")
         logging.debug(f"graphType: {self.graphType}")
@@ -96,6 +97,7 @@ class TspGraphReader:
         logging.debug(f"edgeType: {self.edgeType}")
         logging.debug(f"dimension: {self.dimension}")
 
+    # TODO This would probably make more sense as a to_string function 
     def print_foodSources(self, index=-1):
         if logging.root.level  >= logging.DEBUG:
             # Print all
