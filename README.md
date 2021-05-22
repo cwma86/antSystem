@@ -34,9 +34,7 @@ make check
 ```
 or
 ```bash
-./test/TestTspGraph.py
-./test/TestEnvironment.py
-./test/WorkerAnt.py
+	python3 -m unittest discover test/
 ```
 
 
