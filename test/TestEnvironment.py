@@ -27,7 +27,7 @@ class TestEnvironment(unittest.TestCase):
                     (8, 4.0, 1.0),
                     (9, 5.0, 1.0),
                     (10, 10.0, 10.0)]
-    environment = Environment(foodSources)
+    environment = Environment(foodSources, workerAntCount=1)
     pheromoneTrails = environment.explore()
     sortedTrails = dict(sorted(pheromoneTrails.items(), key=lambda item: item[1], reverse=True))
     logging.debug(sortedTrails)

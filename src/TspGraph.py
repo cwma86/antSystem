@@ -5,7 +5,7 @@ import sys
 from Environment import Environment
 
 class TspGraph:
-    def __init__(self, filename):
+    def __init__(self, filename, workerAntCount = None):
         # initialize required vars
         self.graphName='', 
         self.graphComment=''
@@ -38,7 +38,7 @@ class TspGraph:
                     sys.exit(1)
                 currentLine = file.readline()
                 count = count + 1
-        environment = Environment(self.foodSources)
+        environment = Environment(self.foodSources, workerAntCount)
         trails = environment.explore()
 
         sortedTrails = sorted(trails.values())
@@ -54,12 +54,36 @@ class TspGraph:
     @classmethod
     def _validate(cls, *args, **kwargs):
         try:
+            hasFilenameArgument = False
+            for argument in kwargs.keys():
+                if argument == 'filename':
+                    hasFilenameArgument = True
+                    break
+            assert hasFilenameArgument
             assert not args
-            assert list(kwargs.keys()) == ['filename']
+            assert os.path.isfile(kwargs['filename'])
+        except AssertionError:
+            logging.warning(f"Filename argument not present")
+            return False
+
+        try:
+            assert not args
             assert os.path.isfile(kwargs['filename'])
         except AssertionError:
             logging.warning(f"invalid file path {kwargs['filename']} - failed to construct")
             return False
+
+        try:
+            isAllValidArguments = True
+            validArguments = ['filename', 'v', 'verbose', 'a', 'workerAntCount']
+            for argument in kwargs.keys():
+                try:
+                    validArguments.index(argument)
+                except ValueError:
+                    isAllValidArguments = False
+            assert isAllValidArguments
+        except AssertionError:
+            logging.warning(f"invalid arguments present: {kwargs.keys()}")
         return True
 
     def __new__(cls, *args, **kwargs):

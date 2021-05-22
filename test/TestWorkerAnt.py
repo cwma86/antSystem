@@ -24,7 +24,7 @@ class TestWorkerAnt(unittest.TestCase):
                     (4, 1.0, 4.0),
                     (5, 1.0, 5.0),
 ]
-    environment = Environment(foodSources)
+    environment = Environment(foodSources, workerAntCount=2)
     workerAnts = []
     workerAnt = WorkerAnt(environment)
     # Hack to remove the randomness out of WorkerAnt's constructor
