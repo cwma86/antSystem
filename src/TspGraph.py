@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from Environment import Environment
 
@@ -21,9 +22,9 @@ class TspGraph:
             # Get TSP header info
             file, currentLine = self.__read_header(file)
 
-            count = 0
+            count = 1
             # Starting on the first graph vertex. Grab all the vertices
-            while 'EOF' not in currentLine and count <= self.dimension:
+            while count <= self.dimension:
                 foodData = [i.strip() for i in currentLine.split(' ')]
 
                 # TODO we should create a class for food sources so that 
@@ -33,8 +34,8 @@ class TspGraph:
                                             float(foodData[1]), 
                                             float(foodData[2])))
                 except ValueError:
-                    logging.warning(f"Unable to parse line: {currentLine}")
-                    return
+                    logging.error(f"Unable to parse line: {currentLine}, expected { self.dimension - count + 1} lines")
+                    sys.exit(1)
                 currentLine = file.readline()
                 count = count + 1
         environment = Environment(self.foodSources)
@@ -43,10 +44,11 @@ class TspGraph:
         sortedTrails = sorted(trails.values())
         print(sortedTrails)
 
-        # Print out the vertices
-        self.print_foodSources()
+        # Write the vertices to log file
+        if logging.root.level  >= logging.DEBUG:
+            self.foodSources_toFile()
 
-        self.print_header()
+        logging.debug(self.header_toString())
         logging.info('finished')
 
     @classmethod
@@ -89,24 +91,32 @@ class TspGraph:
                 self.edgeType = lineContent
         return file, currentLine
 
-    # TODO This would probably make more sense as a to_string function 
-    def print_header(self):
-        logging.debug(f"graphName: {self.graphName}")
-        logging.debug(f"graphType: {self.graphType}")
-        logging.debug(f"graphComment: {self.graphComment}")
-        logging.debug(f"edgeType: {self.edgeType}")
-        logging.debug(f"dimension: {self.dimension}")
 
-    # TODO This would probably make more sense as a to_string function 
-    def print_foodSources(self, index=-1):
-        if logging.root.level  >= logging.DEBUG:
-            # Print all
-            if index == -1:
-                for food in self.foodSources:
-                    logging.debug(f"food: {food}")
-            else:
-                try:
-                    logging.debug(f"food{index}: {self.foodSources[index]}")
-                except ValueError:
-                    logging.warning("Invalid index: {index}")
+    def header_toString(self):
+        headerString = (f"graphName: {self.graphName}, ")
+        headerString += (f"graphType: {self.graphType}, ")
+        headerString += (f"graphComment: {self.graphComment}, ")
+        headerString += (f"edgeType: {self.edgeType}, ")
+        headerString += (f"dimension: {self.dimension}")
+        return headerString
+ 
 
+    def foodSources_toString(self, index=-1):
+        foodSourcesString = ""
+        if index == -1:
+            for food in self.foodSources:
+                foodSourcesString += (f"food: {food}\n")
+        else:
+            try:
+                foodSourcesString += (f"food{index}: {self.foodSources[index]}\n")
+            except ValueError:
+                logging.warning("Invalid index: {index}")
+        return foodSourcesString
+
+
+    def foodSources_toFile(self):
+            # log to file
+            logFile = os.path.join(os.getcwd(), "foodSources.txt")
+            logging.debug(f"writing food sourcces to log file at: {logFile}")
+            with open(logFile, "w") as oFile:
+                oFile.write(self.foodSources_toString())
