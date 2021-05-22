@@ -34,7 +34,7 @@ class WorkerAnt:
             #Visit only new sources
             if foodSource in self.VisitedFoodSources:
                 continue
-            if foodSource[0] == self.CurrentFoodSource[0]:
+            if foodSource.FoodSourceId == self.CurrentFoodSource.FoodSourceId:
                 continue
 
             #Keep track of the nearest food source
