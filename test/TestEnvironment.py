@@ -16,7 +16,7 @@ logging.basicConfig(
             level=logging.INFO)
 
 class TestEnvironment(unittest.TestCase):
-  def test_invalidInputFile(self):
+  def test_validInputFile(self):
     foodSources = [ (1, 1.0, 1.0), 
                     (2, 1.0, 2.0),
                     (3, 1.0, 3.0),
@@ -27,7 +27,7 @@ class TestEnvironment(unittest.TestCase):
                     (8, 4.0, 1.0),
                     (9, 5.0, 1.0),
                     (10, 10.0, 10.0)]
-    environment = Environment(foodSources)
+    environment = Environment(foodSources, workerAntCount=1)
     pheromoneTrails = environment.explore()
     sortedTrails = dict(sorted(pheromoneTrails.items(), key=lambda item: item[1], reverse=True))
     logging.debug(sortedTrails)

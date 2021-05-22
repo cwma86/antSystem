@@ -5,3 +5,4 @@ make:
 check:
 	@./test/TestTspGraph.py
 	@./test/TestEnvironment.py
+	@./test/TestWorkerAnt.py
