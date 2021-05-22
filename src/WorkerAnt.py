@@ -34,6 +34,8 @@ class WorkerAnt:
             #Visit only new sources
             if foodSource in self.VisitedFoodSources:
                 continue
+            if foodSource[0] == self.CurrentFoodSource[0]:
+                continue
 
             #Keep track of the nearest food source
             distance = math.dist((self.CurrentFoodSource.XPos, self.CurrentFoodSource.YPos), (foodSource.XPos, foodSource.YPos))
