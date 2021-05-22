@@ -5,7 +5,7 @@ class WorkerAnt:
     def __init__(self, environment):
         startingSpot = environment.FoodSources[random.randrange(0, len(environment.FoodSources))]
         self.CurrentFoodSource = startingSpot
-        self.VisitedFoodSources = set(startingSpot)
+        self.VisitedFoodSources = [startingSpot]
         self.Environment = environment
 
     def move(self):
@@ -22,7 +22,7 @@ class WorkerAnt:
             pheromoneTrail = (nextFoodSource, self.CurrentFoodSource)
 
         self.CurrentFoodSource = nextFoodSource
-        self.VisitedFoodSources.add(nextFoodSource)
+        self.VisitedFoodSources.append(nextFoodSource)
 
         return pheromoneTrail
 
@@ -31,11 +31,10 @@ class WorkerAnt:
         nearestFoodSource = None
         for foodSource in self.Environment.FoodSources:
             #Visit only new sources
-            if foodSource in self.VisitedFoodSources:
+            if foodSource in self.VisitedFoodSources or self.CurrentFoodSource[0] == foodSource[0]:
                 continue
 
             #Keep track of the nearest food source
-            #distance = abs((self.CurrentFoodSource[1] - foodSource[1])) ** 2 + abs((self.CurrentFoodSource[2] - foodSource[1])) ** 2
             distance = math.dist((self.CurrentFoodSource[1], self.CurrentFoodSource[2]), (foodSource[1], foodSource[2]))
             if nearestFoodSource is None or distance < nearestDistance:
                 nearestFoodSource = foodSource

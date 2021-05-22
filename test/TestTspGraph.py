@@ -57,5 +57,4 @@ class TestTspGraph(unittest.TestCase):
     self.assertAlmostEqual(tspGraph.foodSources[9][2], 8.77000e+02)
 
 if __name__ == '__main__':
-
     unittest.main()
