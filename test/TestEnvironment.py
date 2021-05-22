@@ -16,7 +16,7 @@ logging.basicConfig(
             level=logging.INFO)
 
 class TestEnvironment(unittest.TestCase):
-  def test_invalidInputFile(self):
+  def test_validInputFile(self):
     foodSources = [ (1, 1.0, 1.0), 
                     (2, 1.0, 2.0),
                     (3, 1.0, 3.0),

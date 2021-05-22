@@ -7,7 +7,10 @@ class Environment:
 
     def explore(self):
         ants = [WorkerAnt(self) for i in range(len(self.FoodSources) // 10)]
-        
+        return self.__runWorkerAnts(ants) #PheromoneTrails
+
+
+    def __runWorkerAnts(self, ants):    
         for ant in ants:
             while ant.CurrentFoodSource is not None:
                 trail = ant.move()
