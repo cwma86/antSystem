@@ -3,6 +3,7 @@ import os
 import sys
 
 from Environment import Environment
+from FoodSource import FoodSource
 
 class TspGraph:
     def __init__(self, filename, workerAntCount = None):
@@ -25,14 +26,8 @@ class TspGraph:
             count = 1
             # Starting on the first graph vertex. Grab all the vertices
             while count <= self.dimension:
-                foodData = [i.strip() for i in currentLine.split(' ')]
-
-                # TODO we should create a class for food sources so that 
-                #      the values each of these represent is more clear
                 try:
-                    self.foodSources.append((int(foodData[0]), 
-                                            float(foodData[1]), 
-                                            float(foodData[2])))
+                    self.foodSources.append(FoodSource(currentLine))
                 except ValueError:
                     logging.error(f"Unable to parse line: {currentLine}, expected { self.dimension - count + 1} lines")
                     sys.exit(1)
