@@ -16,8 +16,8 @@ class WorkerAnt:
             self.CurrentFoodSource = None
             return None
 
-        #Sort tyuple by food source index
-        if(self.CurrentFoodSource[0] < nextFoodSource[0]):
+        #Sort tuple by food source index
+        if(self.CurrentFoodSource.FoodSourceId < nextFoodSource.FoodSourceId):
             pheromoneTrail = (self.CurrentFoodSource, nextFoodSource)
         else:
             pheromoneTrail = (nextFoodSource, self.CurrentFoodSource)
@@ -38,7 +38,7 @@ class WorkerAnt:
                 continue
 
             #Keep track of the nearest food source
-            distance = math.dist((self.CurrentFoodSource[1], self.CurrentFoodSource[2]), (foodSource[1], foodSource[2]))
+            distance = math.dist((self.CurrentFoodSource.XPos, self.CurrentFoodSource.YPos), (foodSource.XPos, foodSource.YPos))
             if nearestFoodSource is None or distance < nearestDistance:
                 nearestFoodSource = foodSource
                 nearestDistance = distance
