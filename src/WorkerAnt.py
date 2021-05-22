@@ -5,7 +5,8 @@ class WorkerAnt:
     def __init__(self, environment):
         startingSpot = environment.FoodSources[random.randrange(0, len(environment.FoodSources))]
         self.CurrentFoodSource = startingSpot
-        self.VisitedFoodSources = set(startingSpot)
+        self.VisitedFoodSources = set()
+        self.VisitedFoodSources.add(startingSpot)
         self.Environment = environment
 
     def move(self):
@@ -32,6 +33,8 @@ class WorkerAnt:
         for foodSource in self.Environment.FoodSources:
             #Visit only new sources
             if foodSource in self.VisitedFoodSources:
+                continue
+            if foodSource[0] == self.CurrentFoodSource[0]:
                 continue
 
             #Keep track of the nearest food source

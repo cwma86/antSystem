@@ -22,22 +22,23 @@ class TestWorkerAnt(unittest.TestCase):
                     (2, 1.0, 2.0),
                     (3, 1.0, 3.0),
                     (4, 1.0, 4.0),
-                    (5, 1.0, 5.0),
-]
+                    (5, 1.0, 5.0)]
     environment = Environment(foodSources, workerAntCount=2)
     workerAnts = []
     workerAnt = WorkerAnt(environment)
     # Hack to remove the randomness out of WorkerAnt's constructor
     startingSpot = environment.FoodSources[0]
     workerAnt.CurrentFoodSource = startingSpot
-    workerAnt.VisitedFoodSources = [startingSpot]
+    workerAnt.VisitedFoodSources = set()
+    workerAnt.VisitedFoodSources.add(startingSpot)
     workerAnt.Environment = environment
     workerAnts.append(workerAnt)
     workerAnt = WorkerAnt(environment)
     # Hack to remove the randomness out of WorkerAnt's constructor
     startingSpot = environment.FoodSources[3]
     workerAnt.CurrentFoodSource = startingSpot
-    workerAnt.VisitedFoodSources = [startingSpot]
+    workerAnt.VisitedFoodSources = set()
+    workerAnt.VisitedFoodSources.add(startingSpot)
     workerAnt.Environment = environment
     workerAnts.append(workerAnt)
 
