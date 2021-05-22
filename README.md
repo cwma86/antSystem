@@ -35,6 +35,8 @@ make check
 or
 ```bash
 ./test/TestTspGraph.py
+./test/TestEnvironment.py
+./test/WorkerAnt.py
 ```
 
 
