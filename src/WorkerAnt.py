@@ -1,6 +1,8 @@
 import math
 import random
 
+from FoodSource import Trail
+
 class WorkerAnt: 
     def __init__(self, environment):
         startingSpot = environment.FoodSources[random.randrange(0, len(environment.FoodSources))]
@@ -16,11 +18,7 @@ class WorkerAnt:
             self.CurrentFoodSource = None
             return None
 
-        #Sort tuple by food source index
-        if(self.CurrentFoodSource.FoodSourceId < nextFoodSource.FoodSourceId):
-            pheromoneTrail = (self.CurrentFoodSource, nextFoodSource)
-        else:
-            pheromoneTrail = (nextFoodSource, self.CurrentFoodSource)
+        pheromoneTrail = Trail(self.CurrentFoodSource, nextFoodSource)
 
         self.CurrentFoodSource = nextFoodSource
         self.VisitedFoodSources.add(nextFoodSource)
