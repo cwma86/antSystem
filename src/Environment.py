@@ -1,9 +1,11 @@
 from WorkerAnt import WorkerAnt
 
 class Environment:
+    FoodSourceDistances = dict() #{FoodSource: PriorityQueue<FoodSources>}
+
     def __init__(self, foodSources, workerAntCount = None):
         self.FoodSources = foodSources
-        self.PheromoneTrails = dict() #{ (vertex, vertex): pheromoneScore }
+        self.PheromoneTrails = dict() #{ Trail: pheromoneScore }
 
         # Set the Worker Ant count or the default of the
         # (Food Source size divided by 20) or 5, whichever is greater.
