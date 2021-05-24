@@ -17,8 +17,8 @@ logging.basicConfig(
             datefmt='%Y-%m-%d:%H:%M:%S',
             level=logging.DEBUG)
 
-class c(unittest.TestCase):
-  def test_invalidInputFile(self):
+class test_WorkerAnt(unittest.TestCase):
+  def test_runWorkerAnt(self):
     foodSources = [ FoodSource("1 1.0 1.0"), 
                     FoodSource("2 1.0 2.0"),
                     FoodSource("3 1.0 3.0"),
