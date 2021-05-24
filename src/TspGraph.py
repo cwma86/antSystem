@@ -34,10 +34,15 @@ class TspGraph:
                 currentLine = file.readline()
                 count = count + 1
         environment = Environment(self.foodSources, workerAntCount)
-        trails = environment.explore()
 
-        sortedTrails = sorted(trails.values())
-        print(sortedTrails)
+        cycleCount = 20
+        for i in range(cycleCount):
+            environment.explore()
+            environment.MetricsTracker.addCycle(i,environment.bestAnt.get_ant_trail_total_length())
+        environment.MetricsTracker.getReport()
+
+        # sortedTrails = sorted(trails.values())
+        # print(sortedTrails)
 
         # Write the vertices to log file
         if logging.root.level  >= logging.DEBUG:

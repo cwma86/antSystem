@@ -31,16 +31,16 @@ class test_WorkerAnt(unittest.TestCase):
     # Hack to remove the randomness out of WorkerAnt's constructor
     startingSpot = environment.FoodSources[0]
     workerAnt.CurrentFoodSource = startingSpot
-    workerAnt.VisitedFoodSources = set()
-    workerAnt.VisitedFoodSources.add(startingSpot)
+    workerAnt.VisitedFoodSources = dict()
+    workerAnt.VisitedFoodSources[startingSpot] = 0
     workerAnt.Environment = environment
     workerAnts.append(workerAnt)
     workerAnt = WorkerAnt(environment)
     # Hack to remove the randomness out of WorkerAnt's constructor
     startingSpot = environment.FoodSources[3]
     workerAnt.CurrentFoodSource = startingSpot
-    workerAnt.VisitedFoodSources = set()
-    workerAnt.VisitedFoodSources.add(startingSpot)
+    workerAnt.VisitedFoodSources = dict()
+    workerAnt.VisitedFoodSources[startingSpot] = 0
     workerAnt.Environment = environment
     workerAnts.append(workerAnt)
 

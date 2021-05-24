@@ -1,4 +1,5 @@
 from WorkerAnt import WorkerAnt
+from MetricsTracker import MetricsTracker
 
 class Environment:
     
@@ -15,22 +16,30 @@ class Environment:
             self.WorkerAntCount = workerAntCount
 
         self.FoodSourceDistances = dict() #{FoodSource: list<Trail>}
+        self.MetricsTracker = MetricsTracker()
+        self.bestAnt = None
 
     def explore(self):
         ants = [WorkerAnt(self) for i in range(self.WorkerAntCount)]
         return self.__runWorkerAnts(ants) #PheromoneTrails
 
 
-    def __runWorkerAnts(self, ants):    
+    def __runWorkerAnts(self, ants):
+        shortest = float('inf')
         for ant in ants:
             while ant.CurrentFoodSource is not None:
                 trail = ant.move()
                 
                 if trail is not None:
                     self.mark_trail(trail)
+            length = ant.get_ant_trail_total_length()
+            if (length < shortest):
+                shortest = length
+                self.bestAnt = ant
+        print("Ant Shortest Trail Length", shortest)
 
         return self.PheromoneTrails
-        
+
     def mark_trail(self, pheromoneTrail):
         if pheromoneTrail not in self.PheromoneTrails:
             self.PheromoneTrails[pheromoneTrail] = 0
