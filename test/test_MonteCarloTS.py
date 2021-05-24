@@ -9,7 +9,7 @@ from collections import namedtuple
 from random import choice
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
-src_dir = os.path.join(script_path, "../src")
+src_dir = os.path.join(script_path, "..","src")
 sys.path.insert(1, src_dir)
 from MonteCarloTS import MonteCarloTS
 from MonteCarloTSNode import MonteCarloTSNode
