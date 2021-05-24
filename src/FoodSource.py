@@ -35,8 +35,6 @@ class Trail:
 
         self.DistanceSquared = (foodSource1.XPos - foodSource2.XPos) ** 2 + (foodSource1.YPos - foodSource2.YPos) ** 2
 
-        self.Distance = math.dist((foodSource1.XPos, foodSource1.YPos), (foodSource2.XPos, foodSource2.YPos))
-
     def get_target_foodsource(self, currentFoodSource):
         if currentFoodSource == self.BeginFoodSource:
             return self.EndFoodSource
