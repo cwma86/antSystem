@@ -7,6 +7,9 @@ class WorkerAnt:
         self.VisitedFoodSources = set()
         self.VisitedFoodSources.add(startingSpot)
         self.Environment = environment
+        self.ShuffledFoodSource = [i for i in environment.FoodSources]
+        random.shuffle(self.ShuffledFoodSource)
+        self.ShuffleCountdown = 5
 
     def move(self):
         nextFoodSource = self.find_nearest_foodsource()
@@ -29,9 +32,14 @@ class WorkerAnt:
         # Build the trail map from this food source if it does not exist.
         if self.CurrentFoodSource not in self.Environment.FoodSourceDistances:
             trailList = list()
-            shuffledFoodSources = [i for i in self.Environment.FoodSources]
-            random.shuffle(shuffledFoodSources)
-            for foodSource in shuffledFoodSources:
+
+            if self.ShuffleCountdown == 0:
+                random.shuffle(self.ShuffledFoodSource)
+                self.ShuffleCountdown = 5
+
+            self.ShuffleCountdown -= 1
+
+            for foodSource in self.ShuffledFoodSource[0:100]:
                 if foodSource != self.CurrentFoodSource:
                     distanceSquared = (foodSource.XPos - self.CurrentFoodSource.XPos) ** 2 + (foodSource.YPos - self.CurrentFoodSource.YPos) ** 2
                     trail = (foodSource.FoodSourceId, self.CurrentFoodSource.FoodSourceId, distanceSquared)
