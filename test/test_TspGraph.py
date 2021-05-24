@@ -22,12 +22,12 @@ class test_TspGraph(unittest.TestCase):
     self.assertEqual(tspGraph, None)
 
   def test_validInputFile(self):
-    testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
+    testFilename = os.path.join(script_path, '..','TSPData','pcb10_test.tsp')
     tspGraph = TspGraph(filename=testFilename)
     self.assertNotEqual(tspGraph, None)
 
   def test_validHeaderParse(self):
-    testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
+    testFilename = os.path.join(script_path, '..','TSPData','pcb10_test.tsp')
     tspGraph = TspGraph(filename=testFilename)
     self.assertEqual(tspGraph.graphName, "pcb10")
     self.assertEqual(tspGraph.graphComment, "Drilling problem (Juenger/Reinelt)")
@@ -36,7 +36,7 @@ class test_TspGraph(unittest.TestCase):
     self.assertEqual(tspGraph.dimension, 10)
 
   def test_validDataParse(self):
-    testFilename = os.path.join(script_path, '../TSPData/pcb10_test.tsp')
+    testFilename = os.path.join(script_path, '..','TSPData','pcb10_test.tsp')
     tspGraph = TspGraph(filename=testFilename)
     # Check length
     self.assertEqual(len(tspGraph.foodSources), 10)
