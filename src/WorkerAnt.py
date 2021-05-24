@@ -1,4 +1,5 @@
 import math
+from queue import PriorityQueue
 import random
 
 from FoodSource import Trail
@@ -26,18 +27,27 @@ class WorkerAnt:
         return pheromoneTrail
 
     def find_nearest_foodsource(self):
-        nearestDistance = 0
         nearestFoodSource = None
-        for foodSource in self.Environment.FoodSources:
-            #Visit only new sources
-            if foodSource in self.VisitedFoodSources:
-                continue
-            if foodSource.FoodSourceId == self.CurrentFoodSource.FoodSourceId:
-                continue
 
-            #Keep track of the nearest food source
-            distance = math.dist((self.CurrentFoodSource.XPos, self.CurrentFoodSource.YPos), (foodSource.XPos, foodSource.YPos))
-            if nearestFoodSource is None or distance < nearestDistance:
-                nearestFoodSource = foodSource
-                nearestDistance = distance
+        # Build the trail map from this food source if it does not exist.
+        if self.CurrentFoodSource not in self.Environment.FoodSourceDistances:
+            self.Environment.FoodSourceDistances[self.CurrentFoodSource] = list()
+            distanceQueue = PriorityQueue()
+            for foodSource in self.Environment.FoodSources:
+                if foodSource != self.CurrentFoodSource:
+                    distanceQueue.put(Trail(self.CurrentFoodSource, foodSource))
+
+            while not distanceQueue.empty():
+                self.Environment.FoodSourceDistances[self.CurrentFoodSource].append(distanceQueue.get())
+
+            print(len(self.Environment.FoodSourceDistances))
+
+        # Find the nearest unvisited food source
+        trailDistanceList = self.Environment.FoodSourceDistances[self.CurrentFoodSource]
+        for trail in trailDistanceList:
+            targetFoodSource = trail.get_target_foodsource(self.CurrentFoodSource)
+            if targetFoodSource not in self.VisitedFoodSources:
+                nearestFoodSource = targetFoodSource
+                break
+            
         return nearestFoodSource

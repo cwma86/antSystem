@@ -1,8 +1,8 @@
 from WorkerAnt import WorkerAnt
+from queue import PriorityQueue
 
 class Environment:
-    FoodSourceDistances = dict() #{FoodSource: PriorityQueue<FoodSources>}
-
+    
     def __init__(self, foodSources, workerAntCount = None):
         self.FoodSources = foodSources
         self.PheromoneTrails = dict() #{ Trail: pheromoneScore }
@@ -13,6 +13,8 @@ class Environment:
             self.WorkerAntCount = max(len(self.FoodSources) // 20, 5)
         else:
             self.WorkerAntCount = workerAntCount
+
+        self.FoodSourceDistances = dict() #{FoodSource: list<Trail>}
 
     def explore(self):
         ants = [WorkerAnt(self) for i in range(self.WorkerAntCount)]
