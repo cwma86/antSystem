@@ -1,8 +1,4 @@
-import math
-from queue import PriorityQueue
 import random
-
-from FoodSource import Trail
 
 class WorkerAnt: 
     def __init__(self, environment):
@@ -19,35 +15,48 @@ class WorkerAnt:
             self.CurrentFoodSource = None
             return None
 
-        pheromoneTrail = Trail(self.CurrentFoodSource, nextFoodSource)
+        targetFoodSourceId = self.get_target_foodsource(self.CurrentFoodSource, nextFoodSource)
+        targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
 
-        self.CurrentFoodSource = nextFoodSource
-        self.VisitedFoodSources.add(nextFoodSource)
+        self.CurrentFoodSource = targetFoodSource
+        self.VisitedFoodSources.add(targetFoodSource)
 
-        return pheromoneTrail
+        return nextFoodSource
 
     def find_nearest_foodsource(self):
         nearestFoodSource = None
 
         # Build the trail map from this food source if it does not exist.
         if self.CurrentFoodSource not in self.Environment.FoodSourceDistances:
-            self.Environment.FoodSourceDistances[self.CurrentFoodSource] = list()
-            distanceQueue = PriorityQueue()
-            for foodSource in self.Environment.FoodSources:
+            trailList = list()
+            shuffledFoodSources = [i for i in self.Environment.FoodSources]
+            random.shuffle(shuffledFoodSources)
+            for foodSource in shuffledFoodSources:
                 if foodSource != self.CurrentFoodSource:
-                    distanceQueue.put(Trail(self.CurrentFoodSource, foodSource))
+                    distanceSquared = (foodSource.XPos - self.CurrentFoodSource.XPos) ** 2 + (foodSource.YPos - self.CurrentFoodSource.YPos) ** 2
+                    trail = (foodSource.FoodSourceId, self.CurrentFoodSource.FoodSourceId, distanceSquared)
+                    trailList.append(trail)
 
-            while not distanceQueue.empty():
-                self.Environment.FoodSourceDistances[self.CurrentFoodSource].append(distanceQueue.get())
+            trailList.sort(key= lambda t: t[2])
+            self.Environment.FoodSourceDistances[self.CurrentFoodSource] = trailList
 
             print(len(self.Environment.FoodSourceDistances))
 
         # Find the nearest unvisited food source
         trailDistanceList = self.Environment.FoodSourceDistances[self.CurrentFoodSource]
         for trail in trailDistanceList:
-            targetFoodSource = trail.get_target_foodsource(self.CurrentFoodSource)
+            targetFoodSourceId = self.get_target_foodsource(self.CurrentFoodSource, trail)
+            targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
             if targetFoodSource not in self.VisitedFoodSources:
-                nearestFoodSource = targetFoodSource
+                nearestFoodSource = trail
                 break
-            
+
         return nearestFoodSource
+
+    def get_target_foodsource(self, currentFoodSource, trail):
+        if currentFoodSource.FoodSourceId == trail[0]:
+            return trail[1]
+        elif currentFoodSource.FoodSourceId == trail[1]:
+            return trail[0]
+
+        return None

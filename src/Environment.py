@@ -1,11 +1,11 @@
 from WorkerAnt import WorkerAnt
-from queue import PriorityQueue
 
 class Environment:
     
     def __init__(self, foodSources, workerAntCount = None):
         self.FoodSources = foodSources
-        self.PheromoneTrails = dict() #{ Trail: pheromoneScore }
+        self.FoodSourceDict = {f.FoodSourceId : f for f in self.FoodSources}
+        self.PheromoneTrails = dict() #{ Tuple(foodSourceId, FoodSourceId, distanceSquared): pheromoneScore }
 
         # Set the Worker Ant count or the default of the
         # (Food Source size divided by 20) or 5, whichever is greater.
