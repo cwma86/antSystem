@@ -26,6 +26,10 @@ for providing a different data file
 ./src/antSystem.py --filename <path to file>
 ```
 
+## Min-max Ant Colony optimization
+```bash
+./src/MMACO/runTspFile.py --filename TSPData/lin318.tsp
+```
 ## testing
 
 To run project unit test run 
