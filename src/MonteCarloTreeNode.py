@@ -12,11 +12,13 @@ class MCTSNode:
         self.VisitedFoodSources = set(ongoingTour)
         self.CurrentFoodSource = currentFoodSource
         self.ChildNodes = []
+        self.ChildNodesVisited = {}
 
         parentFoodSourceId = parent.get_foodsource().FoodSourceId
 
         self.PheromoneScore = environment.get_pheromone_score(parentFoodSourceId, currentFoodSource.FoodSourceId)
-        self.AverageTourDistance = 0
+        self.AverageTourDistance = math.inf
+        self.BestTourDistance = math.inf
         self.VisitCount = 0
         self.IsFullyExpanded = False
 
@@ -60,6 +62,37 @@ class MCTSNode:
 
         return tourScore
 
+    def propagate(self, rolloutScore):
+        currentNode = self
+
+        currentNode.BestTourDistance = rolloutScore
+        currentNode.AverageTourDistance = rolloutScore
+        currentNode.VisitCount = 1
+
+        parent = currentNode.Parent
+        while parent is not None:
+            # propagate the best tour distance to the parent
+            if currentNode.BestTourDistance < parent.BestTourDistance:
+                parent.BestTourDistance = currentNode.BestTourDistance
+
+            # Add the current node to the parent's visited nodes
+            if currentNode not in parent.ChildNodesVisited:
+                parent.ChildNodesVisited.add(currentNode)
+
+            # Calculate the parent's new average tour distance
+            summedChildScores = 0
+            for visitedNode in parent.ChildNodesVisited:
+                summedChildScores += visitedNode.AverageTourDistance
+
+            parent.AverageTourDistance = summedChildScores / len(parent.ChildNodesVisited)
+            
+            # Increment the parent's visit count
+            parent.VisitCount += 1
+
+            # Move one step up the tree
+            currentNode = parent
+            parent = currentNode.Parent
+    
     def sore_tour(self, tour):
         totalLength = 0
 
