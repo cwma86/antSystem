@@ -39,6 +39,12 @@ def main(inputargs):
   tspData = TspParser(inputargs.filename)
   logging.debug(f"{len(tspData.nodes)} nodes created")
   logging.debug(tspData.data_to_string())
+  minPath, minDist = brute_force_solution(tspData)  
+  for i in reversed(range(len(minPath))):
+    print(f"node[{i}]: {minPath[i]} ")
+  print(f"best solution distance {minDist}")
+
+def brute_force_solution(tspData):
   minDist = float('inf')
   minPath = None
   counter = 0 
@@ -65,10 +71,7 @@ def main(inputargs):
       if counter % 10000 == 0:
         logging.info(f"counter[{counter}]best solution distance {minDist}")
       counter +=1
-  
-  for i in reversed(range(len(minPath))):
-    print(f"node[{i}]: {minPath[i]} ")
-  print(f"best solution distance {minDist}")
+  return minPath, minDist
 
 
 
