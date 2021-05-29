@@ -51,9 +51,8 @@ class TspData:
     return self.pheromone.get_value(fromIndex, to)
 
 
-  def evaporate_pheromone(self):
+  def evaporate_pheromone(self, decay):
     ''' uses index 1 matrix locations'''
-    decay = 0.1
     for node in self.pheromone.matrix:
       node = (1-decay) * node    
 

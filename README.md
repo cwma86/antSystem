@@ -30,6 +30,12 @@ for providing a different data file
 ```bash
 ./src/MMACO/runTspFile.py --filename TSPData/lin318.tsp
 ```
+## Brute force solution
+This solution take a long time and uses a lot of memory. Don't go over 20 nodes
+```bash
+ ./src/BruteForce/BruteForce.py --filename TSPData/lin20.tsp 
+ ```
+
 ## testing
 
 To run project unit test run 

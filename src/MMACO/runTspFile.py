@@ -2,6 +2,7 @@
 import argparse
 import logging
 import os
+import math
 
 from MMACO import MMACO
 from SymetricMatrix import SymetricMatrix
@@ -9,7 +10,7 @@ from TspParser import TspParser
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 
 def args():
-  defaultFilePath = os.path.join(script_path, '..', '..', 'TSPData','lin318.tsp')
+  defaultFilePath = os.path.join(script_path, '..', '..', 'TSPData','pcb10_test.tsp')
   parser = argparse.ArgumentParser(description='Run Ant System')   
   parser.add_argument('--filename', default=defaultFilePath, type=str,
                       help='file path of tsp data')
@@ -40,9 +41,16 @@ def main(inputargs):
   tspData = TspParser(inputargs.filename)
   logging.debug(f"{len(tspData.nodes)} nodes created")
   logging.debug(tspData.data_to_string())
-  bestSolution = MMACO(tspData)
+  numAttempts = tspData.dimension * tspData.dimension
+  #numAttempts = tspData.dimension * math.log(tspData.dimension)
+  #numAttempts = tspData.dimension
+  numOfAnts = tspData.dimension
+  bestSolution, bestDist = MMACO(tspData, numOfAnts=numOfAnts, 
+                                 numberOfAttempts=numAttempts, 
+                                 pheromoneDecay=0.2)
   for i in range(len(bestSolution)):
     print(f"node[{i}]: {bestSolution[i]}")
+  print(f"bestDist: {bestDist}")
   
 if __name__ == "__main__":
   inputargs = args()
