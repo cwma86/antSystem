@@ -19,10 +19,12 @@ class WorkerAnt:
             self.CurrentFoodSource = None
             return None
 
-        targetFoodSourceId = self.get_target_foodsource(self.CurrentFoodSource, trailTuple)
+        targetFoodSourceId = self.Environment.get_target_foodsource(self.CurrentFoodSource, trailTuple)
         targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
 
         self.CurrentFoodSource = targetFoodSource
+
+        #Keep track of the order of the visited Food Sources as we add them
         self.VisitedFoodSources[targetFoodSource] = len(self.VisitedFoodSources)
 
         return trailTuple
@@ -34,41 +36,51 @@ class WorkerAnt:
         if self.CurrentFoodSource not in self.Environment.FoodSourceDistances:
             trailList = list()
 
-            if self.ShuffleCountdown == 0:
-                random.shuffle(self.ShuffledFoodSource)
-                self.ShuffleCountdown = 5
+            # Shuffle the Food Source list every 5 Worker Ant steps for variance.
+            # We need to do this since we only generate distance trails from
+            # the current food source for a fraction of the Food Sources in
+            # the environment.
+            # if self.ShuffleCountdown == 0:
+            #     random.shuffle(self.ShuffledFoodSource)
+            #     self.ShuffleCountdown = 5
 
-            self.ShuffleCountdown -= 1
+            # self.ShuffleCountdown -= 1
 
-            for foodSource in self.ShuffledFoodSource[0:100]:
+            random.shuffle(self.ShuffledFoodSource)
+
+            for foodSource in self.ShuffledFoodSource[0:len(self.Environment.FoodSources) // 5]:
                 if foodSource != self.CurrentFoodSource:
                     distanceSquared = (foodSource.XPos - self.CurrentFoodSource.XPos) ** 2 + (foodSource.YPos - self.CurrentFoodSource.YPos) ** 2
-                    trail = (foodSource.FoodSourceId, self.CurrentFoodSource.FoodSourceId, distanceSquared)
+                    
+                    # Sort the Food Sources by ID in the Tuple so that a path in either
+                    # direction is the same trail. Otherwise A -> B would be a different
+                    # trail than B -> A.
+                    if foodSource.FoodSourceId < self.CurrentFoodSource.FoodSourceId:
+                        trail = (foodSource.FoodSourceId, self.CurrentFoodSource.FoodSourceId, distanceSquared)
+                    else:
+                        trail = (self.CurrentFoodSource.FoodSourceId, foodSource.FoodSourceId, distanceSquared)
+
                     trailList.append(trail)
 
+            # Sort the trail by distance, ascending
             trailList.sort(key= lambda t: t[2])
-            self.Environment.FoodSourceDistances[self.CurrentFoodSource] = trailList
 
-            # print(len(self.Environment.FoodSourceDistances))
+            # Store all the possible trails from this Food Source 
+            # sorted by distance into a dictionary for later use.
+            # This way distances between any two food sources will 
+            # need to be calculated only one time for the entire run.
+            self.Environment.FoodSourceDistances[self.CurrentFoodSource] = trailList
 
         # Find the nearest unvisited food source
         trailDistanceList = self.Environment.FoodSourceDistances[self.CurrentFoodSource]
         for trail in trailDistanceList:
-            targetFoodSourceId = self.get_target_foodsource(self.CurrentFoodSource, trail)
+            targetFoodSourceId = self.Environment.get_target_foodsource(self.CurrentFoodSource, trail)
             targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
             if targetFoodSource not in self.VisitedFoodSources:
                 nearestFoodSourceTrailTuple = trail
                 break
 
         return nearestFoodSourceTrailTuple
-
-    def get_target_foodsource(self, currentFoodSource, trail):
-        if currentFoodSource.FoodSourceId == trail[0]:
-            return trail[1]
-        elif currentFoodSource.FoodSourceId == trail[1]:
-            return trail[0]
-
-        return None
 
     def get_ant_trail_total_length(self):
         totalTrailLength = 0
