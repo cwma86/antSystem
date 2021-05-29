@@ -42,7 +42,9 @@ def main(inputargs):
   minDist = float('inf')
   minPath = None
   counter = 0 
-  startNodeSet = set(tspData.nodes.copy())
+  startNodeSet = set()
+  for node in tspData.nodes:
+    startNodeSet.add(node.nodeId)
   startPoint = startNodeSet.pop()
   for node in startNodeSet:
     nodeSet = set(startNodeSet.copy())
@@ -50,22 +52,22 @@ def main(inputargs):
     paths = find_all_paths(nodeSet)
     tempNodes = [node]
     for path in paths:
-      distancePath = [startPoint.nodeId]
-      distancePath.append(node.nodeId)
+      distancePath = [startPoint]
+      distancePath.append(node)
       for tmpNode in path:
-        distancePath.append(tmpNode.nodeId)
+        distancePath.append(tmpNode)
       if len(distancePath) < 10:
         logging.error("this shouldn't happen")
       dist = calculate_path_distance(distancePath, tspData)
       if dist < minDist or minPath == None:
         minDist = dist
-        minPath = path 
-      if counter % 1000 == 0:
+        minPath = distancePath 
+      if counter % 10000 == 0:
         logging.info(f"counter[{counter}]best solution distance {minDist}")
       counter +=1
   
   for i in reversed(range(len(minPath))):
-    print(f"node[{i}]: {minPath[i].nodeId} ")
+    print(f"node[{i}]: {minPath[i]} ")
   print(f"best solution distance {minDist}")
 
 
