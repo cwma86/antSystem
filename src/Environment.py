@@ -15,6 +15,10 @@ class Environment:
         else:
             self.WorkerAntCount = workerAntCount
 
+        # Trail distance dictionary for fast distance lookup
+        self.FoodSourceDistanceLookup = dict() # {FoodSourceId: {FoodSourceId: distanceSquared}}
+
+        # Trail distance list for closest distance lookup.
         self.FoodSourceDistances = dict() #{FoodSource: list of Tuple(foodSourceId, FoodSourceId, distanceSquared)}
         self.MetricsTracker = MetricsTracker()
         self.bestAnt = None
@@ -67,3 +71,14 @@ class Environment:
 
         return None
 
+    def get_pheromone_score(self, foodSourceId1, foodSourceId2):
+        if foodSourceId1 < foodSourceId2:
+            return self.PheromoneTrails[(foodSourceId1, foodSourceId2)]
+        else:
+            return self.PheromoneTrails[(foodSourceId2, foodSourceId1)]
+
+    def find_trail_distance(self, foodSourceId1, foodSourceId2):
+        if foodSourceId1 < foodSourceId2:
+            return self.FoodSourceDistanceLookup[foodSourceId1][foodSourceId2]
+        else:
+            return self.FoodSourceDistanceLookup[foodSourceId2][foodSourceId1]

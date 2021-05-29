@@ -44,7 +44,7 @@ class test_WorkerAnt(unittest.TestCase):
     workerAnt.Environment = environment
     workerAnts.append(workerAnt)
 
-    workerAnt.ShuffledFoodSource = [i for i in environment.FoodSources]
+    workerAnt.ShuffledFoodSources = [i for i in environment.FoodSources]
     workerAnt.ShuffleCountdown = 5
     pheromoneTrails = environment._Environment__runWorkerAnts(workerAnts)
 

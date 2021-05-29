@@ -8,8 +8,8 @@ class WorkerAnt:
         self.VisitedFoodSources = dict()  # FoodSource > visited order
         self.VisitedFoodSources[startingSpot] = 0
         self.Environment = environment
-        self.ShuffledFoodSource = [i for i in environment.FoodSources]
-        random.shuffle(self.ShuffledFoodSource)
+        self.ShuffledFoodSources = [i for i in environment.FoodSources]
+        random.shuffle(self.ShuffledFoodSources)
         self.ShuffleCountdown = 5
 
     def move(self):
@@ -46,9 +46,11 @@ class WorkerAnt:
 
             # self.ShuffleCountdown -= 1
 
-            random.shuffle(self.ShuffledFoodSource)
+            # random.shuffle(self.ShuffledFoodSources)
+            # randomFoodSources = self.ShuffledFoodSources[0:len(self.Environment.FoodSources) // 5]
+            randomFoodSources = self.ShuffledFoodSources
 
-            for foodSource in self.ShuffledFoodSource[0:len(self.Environment.FoodSources) // 5]:
+            for foodSource in randomFoodSources:
                 if foodSource != self.CurrentFoodSource:
                     distanceSquared = (foodSource.XPos - self.CurrentFoodSource.XPos) ** 2 + (foodSource.YPos - self.CurrentFoodSource.YPos) ** 2
                     
@@ -60,6 +62,13 @@ class WorkerAnt:
                     else:
                         trail = (self.CurrentFoodSource.FoodSourceId, foodSource.FoodSourceId, distanceSquared)
 
+                    # Insert the trail into the trail distance dictionary for fast lookup
+                    if trail[0] not in self.Environment.FoodSourceDistanceLookup:
+                        self.Environment.FoodSourceDistanceLookup[trail[0]] = dict()
+                    if trail[1] not in self.Environment.FoodSourceDistanceLookup[trail[0]]:
+                        self.Environment.FoodSourceDistanceLookup[trail[0]][trail[1]] = trail[2]
+
+                    # Insert the trail in to the trail distance list for sorting by distance
                     trailList.append(trail)
 
             # Sort the trail by distance, ascending
