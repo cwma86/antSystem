@@ -1,5 +1,8 @@
+import logging
 import random
 import math
+
+from MonteCarloTreeNode import MCTSNode
 
 class Underling:
     def __init__(self, environment):
@@ -8,7 +11,33 @@ class Underling:
         self.StartingFoodSource = startingSpot
         self.CurrentFoodSource = startingSpot
         self.VisitedFoodSources = dict()  # FoodSource > visited order
-        pass
+
+    def execute_mcts(self):
+        mcts = MCTSNode(self.Environment, None, self.CurrentFoodSource, [self.CurrentFoodSource])
+
+
+        logging.info(f'Root Food Source: {mcts.get_foodsource().FoodSourceId}')
+        logging.info(f'Root AVG: {mcts.AverageTourDistance}')
+        logging.info(f'Root BEST: {mcts.BestTourDistance}')
+
+        selectedNode = mcts.select()
+
+        logging.info(f'Selected Food Source: {selectedNode.get_foodsource().FoodSourceId}')
+        logging.info(f'Parent Food Source: {selectedNode.Parent.get_foodsource().FoodSourceId}')
+        logging.info(f'Selected AVG: {selectedNode.AverageTourDistance}')
+        logging.info(f'Selected BEST: {selectedNode.BestTourDistance}')
+
+        tourScore = selectedNode.rollout()
+
+        logging.info(f'Tour Score: {tourScore}')
+        # selectedNode.propagate(tourScore)
+
+        # resources = 20
+        # while resources > 0:
+        #     selectedNode = mcts.select()
+        #     tourScore = selectedNode.rollout()
+        #     selectedNode.propagate(tourScore)
+        #     resources -= 1
 
     def complete_full_tour(self):
         self.VisitedFoodSources = dict()
@@ -30,7 +59,7 @@ class Underling:
     def find_next(self):
         foodSourceToTrailList = self.Environment.FoodSourceDistances[self.CurrentFoodSource]
 
-        smallestScore = float('inf');
+        smallestScore = float('inf')
         nextFoodSource = None
         for trailTuple in foodSourceToTrailList:
             if trailTuple not in self.Environment.PheromoneTrails:

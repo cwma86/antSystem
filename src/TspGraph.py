@@ -5,6 +5,7 @@ import sys
 from Environment import Environment
 from FoodSource import FoodSource
 from MetricsTracker import MetricsTracker
+from Underling import Underling
 
 class TspGraph:
     def __init__(self, filename, workerAntCount = None):
@@ -35,14 +36,20 @@ class TspGraph:
                 currentLine = file.readline()
                 count = count + 1
 
-        metricsTracker = MetricsTracker()
-        cycleCount = 10
-        for i in range(cycleCount):
-            environment = Environment(self.foodSources, workerAntCount)
-            environment.explore()
-            metricsTracker.addCycle(i,environment.bestAnt.get_ant_trail_total_length())
+        # metricsTracker = MetricsTracker()
+        # cycleCount = 1
+        # for i in range(cycleCount):
+        #     environment = Environment(self.foodSources, workerAntCount)
+        #     environment.explore()
+        #     metricsTracker.addCycle(i,environment.bestAnt.get_ant_trail_total_length())
 
-        metricsTracker.getReport()
+        # metricsTracker.getReport()
+
+        environment = Environment(self.foodSources, workerAntCount)
+        environment.explore()
+
+        underling = Underling(environment)
+        underling.execute_mcts()
 
         # Write the vertices to log file
         if logging.root.level  >= logging.DEBUG:

@@ -1,3 +1,4 @@
+import logging
 import random
 import math
 
@@ -13,13 +14,16 @@ class WorkerAnt:
         self.ShuffleCountdown = 5
 
     def move(self):
+        # This will fully execute for only the first Worker Ant on only its first move.
+        self.build_lookup_dictionaries()
+
         trailTuple = self.find_nearest_foodsource()
 
         if trailTuple is None:
             self.CurrentFoodSource = None
             return None
 
-        targetFoodSourceId = self.Environment.get_target_foodsource(self.CurrentFoodSource, trailTuple)
+        targetFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource, trailTuple)
         targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
 
         self.CurrentFoodSource = targetFoodSource
@@ -32,7 +36,40 @@ class WorkerAnt:
     def find_nearest_foodsource(self):
         nearestFoodSourceTrailTuple = None
 
-        # Build the trail map from this food source if it does not exist.
+
+        # Find the nearest unvisited food source
+        trailDistanceList = self.Environment.FoodSourceDistances[self.CurrentFoodSource]
+        for trail in trailDistanceList:
+            targetFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource, trail)
+            targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
+            if targetFoodSource not in self.VisitedFoodSources:
+                nearestFoodSourceTrailTuple = trail
+                break
+
+        return nearestFoodSourceTrailTuple
+
+    def get_ant_trail_total_length(self):
+        totalTrailLength = 0
+        sortedVisitedFoodSources = sorted(self.VisitedFoodSources, key=self.VisitedFoodSources.get)
+        previous = sortedVisitedFoodSources[-1]
+        for foodSource in sortedVisitedFoodSources:
+            totalTrailLength += math.sqrt((foodSource.XPos - previous.XPos) ** 2 + (foodSource.YPos - previous.YPos) ** 2)
+            previous = foodSource
+        #Cache this value?
+        return totalTrailLength
+
+    def build_lookup_dictionaries(self):
+        # This will execute only one time for each food source across all
+        # Worker Ants. What you'll notice is that the first Worker Ant for
+        # each Environment will take a long time. That is because this block
+        # must run once for each Food Source.
+
+        # Build the lookup dictionaries for the Food Sources and related information
+        # such as distances, pheromones, and Trails sorted by distance.
+        #
+        # Subsequent Worker ants will act a lot faster because of these dictionaries.
+        # The down side is that this block, building these lookup dictionaries
+        # takes a cumulatively long time on large graphs (read: pla85900.tsp)
         if self.CurrentFoodSource not in self.Environment.FoodSourceDistances:
             trailList = list()
 
@@ -68,6 +105,17 @@ class WorkerAnt:
                     if trail[1] not in self.Environment.FoodSourceDistanceLookup[trail[0]]:
                         self.Environment.FoodSourceDistanceLookup[trail[0]][trail[1]] = trail[2]
 
+                    # Insert the trail into the Pheromone Dictionary for fast lookup
+                    # The food sources are already sorted by ID.
+                    # 
+                    # We are stripping the distance from the original tuple
+                    # both because we don't need it here, and also so the PheromoneTrails
+                    # dictionary is searchable. Including the distance in the key of
+                    # the dictionary would make finding a specific pheromone trail tough.
+                    trailTuple = (trail[0], trail[1])
+                    if trailTuple not in self.Environment.PheromoneTrails:
+                        self.Environment.PheromoneTrails[trailTuple] = 0
+
                     # Insert the trail in to the trail distance list for sorting by distance
                     trailList.append(trail)
 
@@ -79,24 +127,3 @@ class WorkerAnt:
             # This way distances between any two food sources will 
             # need to be calculated only one time for the entire run.
             self.Environment.FoodSourceDistances[self.CurrentFoodSource] = trailList
-
-        # Find the nearest unvisited food source
-        trailDistanceList = self.Environment.FoodSourceDistances[self.CurrentFoodSource]
-        for trail in trailDistanceList:
-            targetFoodSourceId = self.Environment.get_target_foodsource(self.CurrentFoodSource, trail)
-            targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
-            if targetFoodSource not in self.VisitedFoodSources:
-                nearestFoodSourceTrailTuple = trail
-                break
-
-        return nearestFoodSourceTrailTuple
-
-    def get_ant_trail_total_length(self):
-        totalTrailLength = 0
-        sortedVisitedFoodSources = sorted(self.VisitedFoodSources, key=self.VisitedFoodSources.get)
-        previous = sortedVisitedFoodSources[-1]
-        for foodSource in sortedVisitedFoodSources:
-            totalTrailLength += math.sqrt((foodSource.XPos - previous.XPos) ** 2 + (foodSource.YPos - previous.YPos) ** 2)
-            previous = foodSource
-        #Cache this value?
-        return totalTrailLength

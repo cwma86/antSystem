@@ -1,3 +1,5 @@
+import logging
+from math import log
 from WorkerAnt import WorkerAnt
 
 class Environment:
@@ -43,25 +45,15 @@ class Environment:
         return self.PheromoneTrails
 
     def mark_trail(self, pheromoneTrail):
-
-        # The food sources were already sorted by ID when they were generated in
-        # the WorkerAnt find_nearest_foodsource() method
-        # 
-        # We are stripping the distance from the original tuple
-        # both because we don't need it here, and also so the PheromoneTrails
-        # dictionary is searchable. Including the distance in the key of
-        # the dictionary would make finding a specific pheromone trail tough.
+        # We just want the two food sources. Strip anything else.
         trailTuple = (pheromoneTrail[0], pheromoneTrail[1])
-
-        if trailTuple not in self.PheromoneTrails:
-            self.PheromoneTrails[trailTuple] = 0
 
         self.PheromoneTrails[trailTuple] = self.PheromoneTrails[trailTuple] + 1
 
     # Since the Food Sources in the Trail Tuples are sorted by ID to make
     # A -> B and B -> A the same trail, we need this method to determine
     # which Food Source we are traveling to.
-    def get_target_foodsource(self, currentFoodSource, trailTuple):
+    def get_target_foodsourceId(self, currentFoodSource, trailTuple):
         if currentFoodSource.FoodSourceId == trailTuple[0]:
             return trailTuple[1]
         elif currentFoodSource.FoodSourceId == trailTuple[1]:
@@ -70,10 +62,13 @@ class Environment:
         return None
 
     def get_pheromone_score(self, foodSourceId1, foodSourceId2):
+        trailTuple = None
         if foodSourceId1 < foodSourceId2:
-            return self.PheromoneTrails[(foodSourceId1, foodSourceId2)]
+            trailTuple = (foodSourceId1, foodSourceId2)
         else:
-            return self.PheromoneTrails[(foodSourceId2, foodSourceId1)]
+            trailTuple = (foodSourceId2, foodSourceId1)
+
+        return self.PheromoneTrails[trailTuple]
 
     def find_trail_distance(self, foodSourceId1, foodSourceId2):
         if foodSourceId1 < foodSourceId2:

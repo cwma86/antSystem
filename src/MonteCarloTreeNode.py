@@ -1,3 +1,4 @@
+import logging
 import math
 
 class MCTSNode:
@@ -14,9 +15,12 @@ class MCTSNode:
         self.ChildNodes = []
         self.ChildNodesVisited = {}
 
-        parentFoodSourceId = parent.get_foodsource().FoodSourceId
+        
+        self.PheromoneScore = 0
+        if parent is not None:
+            parentFoodSourceId = parent.get_foodsource().FoodSourceId
+            self.PheromoneScore = environment.get_pheromone_score(parentFoodSourceId, currentFoodSource.FoodSourceId)
 
-        self.PheromoneScore = environment.get_pheromone_score(parentFoodSourceId, currentFoodSource.FoodSourceId)
         self.AverageTourDistance = math.inf
         self.BestTourDistance = math.inf
         self.VisitCount = 0
@@ -93,11 +97,11 @@ class MCTSNode:
             currentNode = parent
             parent = currentNode.Parent
     
-    def sore_tour(self, tour):
+    def score_tour(self, tour):
         totalLength = 0
 
         for i in range(len(tour) - 1):
-            totalLength += self.Environment.find_trail_distance(tour[i].FoodSourceId, tour[i + 1].FoodSourceId)
+            totalLength += math.sqrt(self.Environment.find_trail_distance(tour[i].FoodSourceId, tour[i + 1].FoodSourceId))
         
         return totalLength
 
@@ -108,10 +112,11 @@ class MCTSNode:
         strongestPheromoneFoodSource = None
         strongestPheromoneScore = 0
         for trailTuple in potentialTrails:
-            targetFoodSource = self.Environment.get_target_foodsource(currentFoodSource, trailTuple)
+            targetFoodSourceId = self.Environment.get_target_foodsourceId(currentFoodSource, trailTuple)
+            targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
             if targetFoodSource in visitedFoodSources:
                 continue
-            pheromoneScore = self.Environment.get_pheromone_score(currentFoodSource.FoodSourceId, targetFoodSource.FoodSourceId)
+            pheromoneScore = self.Environment.get_pheromone_score(currentFoodSource.FoodSourceId, targetFoodSourceId)
             if pheromoneScore > strongestPheromoneScore:
                 strongestPheromoneFoodSource = targetFoodSource
                 strongestPheromoneScore = pheromoneScore
@@ -159,7 +164,7 @@ class MCTSNode:
         # Create Trails between the current Food Source
         # and all unvisited Food Sources
         for foodSource in self.Environment.FoodSources:
-            if foodSource not in self.VisitedFoodSources:
+            if foodSource not in self.VisitedFoodSources and foodSource != self.CurrentFoodSource:
                 ongoingTour = list(self.OngoingTour)
                 ongoingTour.append(foodSource)
                 node = MCTSNode(self.Environment, self, foodSource, ongoingTour)
