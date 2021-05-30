@@ -1,5 +1,4 @@
 from WorkerAnt import WorkerAnt
-from MetricsTracker import MetricsTracker
 
 class Environment:
     
@@ -20,7 +19,6 @@ class Environment:
 
         # Trail distance list for closest distance lookup.
         self.FoodSourceDistances = dict() #{FoodSource: list of Tuple(foodSourceId, FoodSourceId, distanceSquared)}
-        self.MetricsTracker = MetricsTracker()
         self.bestAnt = None
 
     def explore(self):

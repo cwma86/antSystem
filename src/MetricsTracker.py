@@ -1,7 +1,7 @@
 class MetricsTracker:
     def __init__(self):
+        self.WorkerAntRuns = []
         self.cycles = []
-        pass
 
     def addCycle(self,count, length):
         self.cycles.append(CycleData(count,length))
