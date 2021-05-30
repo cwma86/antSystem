@@ -8,7 +8,7 @@ sys.path.append(os.path.join(file_path, '..', 'Support'))
 from TspData import TspData
 from TspData import calculate_path_distance
 
-def MMACO(tspData, numOfAnts=2, numberOfAttempts = 20, pheromoneDecay=0.9):
+def MMAS(tspData, numOfAnts=2, numberOfAttempts = 20, pheromoneDecay=0.9):
   global decay 
   decay = pheromoneDecay
   inc = 0
@@ -64,7 +64,7 @@ def tour_construct_solution(tspData, solution):
       pheromone = tspData.get_pheromone(solution[len(solution)-1], freenode2.nodeId)
       tauAlpha = pheromone ** alpha
       NruBeta = (1/distance) ** beta
-      cost = pheromone * NruBeta
+      cost = tauAlpha * NruBeta
       if  q <= q0:
         if solutionDistanceSum > 0 and cost > 0:
           tempDistanceCost = solutionDistanceSum + distance

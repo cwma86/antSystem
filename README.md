@@ -31,10 +31,10 @@ This Algorithm was developed as a comparision mechanism for our MCTS ant colony 
 
 Warning: due to run time complexity, This algorithmn should be limited to solving TSP data sets of about 50 nodes
 ```bash
-./src/Runner/runTspFile.py --filename TSPData/pcb10_test.tsp  --MMACO
+./src/Runner/runTspFile.py --filename TSPData/pcb10_test.tsp  --MMAS
 ```
 ## Brute force solution
-A Brute force solution was created to prove optimal solutions and as a comparision agianst MMACO and MCTSACO
+A Brute force solution was created to prove optimal solutions and as a comparision agianst MMAS and MCTSACO
 
 Warning: This solution is both memory and computationally intensive, I would not reccomend running on a TSP data set over 5 nodes.
 

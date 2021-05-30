@@ -11,10 +11,10 @@ sys.path.insert(1, support_dir)
 from SymetricMatrix import SymetricMatrix
 from TspParser import TspParser
 
-# MMACO imports
-mmaco_dir = os.path.join(script_path, "..","MMACO")
-sys.path.insert(1, mmaco_dir)
-from MMACO import MMACO
+# MMAS imports
+MMAS_dir = os.path.join(script_path, "..","MMAS")
+sys.path.insert(1, MMAS_dir)
+from MMAS import MMAS
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 
 # Brute Force imports
@@ -31,7 +31,7 @@ def args():
                       help='verbose logging')
   parser.add_argument('--MCTS', action='store_true', default=True,
                       help='Run Monte Carlo Tree Search Algorithm (default)')
-  parser.add_argument('--MMACO', action='store_true',
+  parser.add_argument('--MMAS', action='store_true',
                       help='Run Min-Max Ant Colony Optimization Algorithm')
   parser.add_argument('--Brute', action='store_true',
                       help='Run Brute Force Algorithm')
@@ -52,15 +52,15 @@ def args():
   logging.info(f"logging set to {logging.DEBUG}")
   if args.Brute:
     logging.info("Running brute force algorithm")
-    args.MMACO = False
+    args.MMAS = False
     args.MCTS = False
-  elif args.MMACO:
+  elif args.MMAS:
     logging.info("Running Min-Max Ant Colony Optimization algorithm")
     args.Brute = False
     args.MCTS = False
   else:
     logging.info("Running Monte Carlo Tree Search Ant Colony Optimization algorithm")
-    args.MMACO = False
+    args.MMAS = False
     args.Brute = False
  
   return args
@@ -75,7 +75,7 @@ def main(inputargs):
   bestDist = 0
   if inputargs.Brute:
     bestSolution, bestDist = brute_force_solution(tspData)  
-  elif inputargs.MMACO:
+  elif inputargs.MMAS:
     # Algorith Tuning
     numAttempts = tspData.dimension * tspData.dimension
     #numAttempts = int(tspData.dimension * 5 * math.log(tspData.dimension) // 1)
@@ -83,7 +83,7 @@ def main(inputargs):
     numOfAnts = tspData.dimension
     if numOfAnts < 2:
       numOfAnts = 2 
-    bestSolution, bestDist = MMACO(tspData, numOfAnts=numOfAnts, 
+    bestSolution, bestDist = MMAS(tspData, numOfAnts=numOfAnts, 
                                   numberOfAttempts=numAttempts, 
                                   pheromoneDecay=0.2)
   else:
