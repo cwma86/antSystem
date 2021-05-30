@@ -1,5 +1,6 @@
 import logging
 import math
+import random
 
 class MCTSNode:
     def __init__(self, environment, parent, currentFoodSource, ongoingTour = list()):
@@ -28,6 +29,7 @@ class MCTSNode:
 
     def select(self):
         if len(self.ChildNodes) == 0:
+            logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} is populating its children')
             self.populate_children()
 
         if not self.IsFullyExpanded:
@@ -35,6 +37,8 @@ class MCTSNode:
 
             if unvisitedChild is not None:
                 return unvisitedChild
+
+            logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} has no more unvisited children. Marking as Fully Expanded')
 
             # The only time we get here is when there are no more unvisited children
             # Mark this node as fully expanded and then select the best child
@@ -100,6 +104,10 @@ class MCTSNode:
     def score_tour(self, tour):
         totalLength = 0
 
+        if(len(tour) != len(self.Environment.FoodSources)):
+            logging.error('TOUR NOT COMPLETE')
+            logging.error(f'TOUR SIZE: {len(tour)}')
+
         for i in range(len(tour) - 1):
             totalLength += math.sqrt(self.Environment.find_trail_distance(tour[i].FoodSourceId, tour[i + 1].FoodSourceId))
         
@@ -126,8 +134,11 @@ class MCTSNode:
     def pick_unvisited_child(self):
         unvisitedChildren = [i for i in self.ChildNodes if i.get_visit_count() == 0]
 
+        logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} has {len(self.ChildNodes)} child Nodes and {len(unvisitedChildren)} unvisited Child Nodes')
+
         # This is a terminal node. It has no children.
         if len(unvisitedChildren) == 0:
+            logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} has NO MORE CHILDREN')
             return None
 
         # Pick the unvisited child with the highest pheromone score
@@ -138,6 +149,11 @@ class MCTSNode:
                 strongestChild = child
                 strongestChildPheromoneScore = child.get_pheromone_score()
 
+        if strongestChild is None:
+            strongestChild = unvisitedChildren[random.randrange(0, len(unvisitedChildren))]
+
+
+        logging.info(f'The strongest child of {self.CurrentFoodSource.FoodSourceId} is {strongestChild.CurrentFoodSource.FoodSourceId}')
         return strongestChild
 
     def fully_expanded(self):

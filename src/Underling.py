@@ -76,15 +76,13 @@ class Underling:
 
         resources = 20
         while resources > 0:
-            selectedNode = mcts.select()
+            selectedNode = mcts.select() #Expansion is included in this step
             logging.info('Selected Node Initial Info')
             logging.info(f'Selected Food Source ID: {selectedNode.get_foodsource().FoodSourceId}')
             logging.info(f'Parent Food Source ID: {selectedNode.Parent.get_foodsource().FoodSourceId}')
-            logging.info(f'Selected AVG: {selectedNode.AverageTourDistance}')
-            logging.info(f'Selected BEST: {selectedNode.BestTourDistance}')
             logging.info('')
 
-            tourScore = selectedNode.rollout()
+            tourScore = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
             logging.info(f'Tour Score: {tourScore}')
             logging.info('')
 
