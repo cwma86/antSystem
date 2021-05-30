@@ -64,3 +64,22 @@ class TspData:
 
   def cost_to_string(self):
     return self.cost.to_string()
+
+def calculate_path_distance(solution, tspData):
+    distance = 0
+    firstNode = None
+    currNode = None
+    prevNode = None
+    for node in solution:
+      if prevNode == None:
+        firstNode = node
+        prevNode = firstNode
+        continue
+      currNode = node
+      distance += tspData.get_cost_distance(currNode, prevNode)
+      prevNode = currNode
+    # add the distance back to the initial node
+    distance += tspData.get_cost_distance(firstNode, currNode)
+    return distance
+
+

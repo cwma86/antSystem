@@ -27,13 +27,19 @@ for providing a different data file
 ```
 
 ## Min-max Ant Colony optimization
+This Algorithm was developed as a comparision mechanism for our MCTS ant colony optimization problem
+
+Warning: due to run time complexity, This algorithmn should be limited to solving TSP data sets of about 50 nodes
 ```bash
-./src/MMACO/runTspFile.py --filename TSPData/lin318.tsp
+./src/Runner/runTspFile.py --filename TSPData/pcb10_test.tsp  --MMACO
 ```
 ## Brute force solution
-This solution take a long time and uses a lot of memory. Don't go over 20 nodes
+A Brute force solution was created to prove optimal solutions and as a comparision agianst MMACO and MCTSACO
+
+Warning: This solution is both memory and computationally intensive, I would not reccomend running on a TSP data set over 5 nodes.
+
 ```bash
- ./src/BruteForce/BruteForce.py --filename TSPData/lin20.tsp 
+ ./src/Runner/runTspFile.py --filename TSPData/pcb10_test.tsp  --Brute
  ```
 
 ## testing

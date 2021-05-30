@@ -1,7 +1,10 @@
 import logging
+import os
 import random
-import math
+import sys
 
+file_path = os.path.dirname(os.path.abspath( __file__ ))
+sys.path.append(os.path.join(file_path, 'MCTS'))
 from MonteCarloTreeNode import MCTSNode
 
 class Underling:

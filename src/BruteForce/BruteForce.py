@@ -1,48 +1,12 @@
-#!/usr/bin/env python3
-import argparse
 import logging
-import math
 import os
 import sys
 
-script_path = os.path.dirname(os.path.abspath( __file__ ))
-sys.path.append(os.path.join(script_path, '..', 'MMACO'))
+file_path = os.path.dirname(os.path.abspath( __file__ ))
+sys.path.append(os.path.join(file_path, '..', 'Support'))
 from TspParser import TspParser
-from MMACO import calculate_path_distance
+from TspData import calculate_path_distance
 
-def args():
-  defaultFilePath = os.path.join(script_path, '..', '..', 'TSPData','pcb10_test.tsp')
-  parser = argparse.ArgumentParser(description='Run Ant System')   
-  parser.add_argument('--filename', default=defaultFilePath, type=str,
-                      help='file path of tsp data')
-  parser.add_argument('-v', '--verbose', action='store_true',
-                      help='verbose logging')
-  args = parser.parse_args()
-
-  # initialize logger format
-  logLevel = logging.INFO
-  if args.verbose:
-    logLevel = logging.DEBUG
-  logging.basicConfig(
-    format='%(asctime)s,%(msecs)d %(levelname)-8s\
-       [%(filename)s:%(lineno)d] %(message)s',
-    datefmt='%Y-%m-%d:%H:%M:%S',
-    level=logLevel)
-  logging.debug(f"logging set to {logging.DEBUG}")
-  logging.info(f"script_path: {script_path}")
-
-  return args
-
-
-def main(inputargs):
-  # Get data from file
-  tspData = TspParser(inputargs.filename)
-  logging.debug(f"{len(tspData.nodes)} nodes created")
-  logging.debug(tspData.data_to_string())
-  minPath, minDist = brute_force_solution(tspData)  
-  for i in reversed(range(len(minPath))):
-    print(f"node[{i}]: {minPath[i]} ")
-  print(f"best solution distance {minDist}")
 
 def brute_force_solution(tspData):
   minDist = float('inf')
@@ -94,7 +58,3 @@ def find_all_paths(nodes):
         newPath.append(childNode)
       paths.append(newPath)
   return paths
-
-if __name__ == "__main__":
-  inputargs = args()
-  main(inputargs)

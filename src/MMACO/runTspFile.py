@@ -41,10 +41,10 @@ def main(inputargs):
   tspData = TspParser(inputargs.filename)
   logging.debug(f"{len(tspData.nodes)} nodes created")
   logging.debug(tspData.data_to_string())
-  #numAttempts = tspData.dimension * tspData.dimension
-  numAttempts = int(tspData.dimension * 2 * math.log(tspData.dimension) // 1)
+  numAttempts = tspData.dimension * tspData.dimension
+  #numAttempts = int(tspData.dimension * 5 * math.log(tspData.dimension) // 1)
   #numAttempts = tspData.dimension
-  numOfAnts = tspData.dimension//2
+  numOfAnts = tspData.dimension
   if numOfAnts < 2:
     numOfAnts = 2 
   bestSolution, bestDist = MMACO(tspData, numOfAnts=numOfAnts, 

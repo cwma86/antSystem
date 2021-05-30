@@ -18,7 +18,7 @@ def TspParser(filePath):
     return tspData
 
 def parse_header(tspFile, tspData):
-  logging.info(f"getting header")
+  logging.debug(f"getting header")
   name = ""
   comment = ""
   type = ""
@@ -62,7 +62,7 @@ def parse_header(tspFile, tspData):
 
 
 def parse_data(tspFile, tspData):
-  logging.info(f"getting data")
+  logging.debug(f"getting data")
   for node in range(0,tspData.dimension):
     line = tspFile.readline().split()
     try:

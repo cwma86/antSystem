@@ -1,6 +1,12 @@
 import logging
+import os
 import random
+import sys
+
+file_path = os.path.dirname(os.path.abspath( __file__ ))
+sys.path.append(os.path.join(file_path, '..', 'Support'))
 from TspData import TspData
+from TspData import calculate_path_distance
 
 def MMACO(tspData, numOfAnts=2, numberOfAttempts = 20, pheromoneDecay=0.9):
   global decay 
@@ -24,7 +30,7 @@ def MMACO(tspData, numOfAnts=2, numberOfAttempts = 20, pheromoneDecay=0.9):
     #temp
     if inc > numberOfAttempts:
       break
-    if inc % 2 == 0:
+    if inc % 20 == 0:
       logging.info(f"attempt: {inc} best distance: {bestDist}")
 
     inc += 1
@@ -109,21 +115,3 @@ def update_best_solution(bestSolution, bestDist, solutions, tspData):
       bestSolution = solution
       bestDist = distance
   return bestSolution, bestDist
-
-def calculate_path_distance(solution, tspData):
-    distance = 0
-    firstNode = None
-    currNode = None
-    prevNode = None
-    for node in solution:
-      if prevNode == None:
-        firstNode = node
-        prevNode = firstNode
-        continue
-      currNode = node
-      distance += tspData.get_cost_distance(currNode, prevNode)
-      prevNode = currNode
-    # add the distance back to the initial node
-    distance += tspData.get_cost_distance(firstNode, currNode)
-    return distance
-
