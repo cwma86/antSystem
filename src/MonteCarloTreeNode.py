@@ -13,7 +13,7 @@ class MCTSNode:
         self.VisitedFoodSources = set(ongoingTour)
         self.CurrentFoodSource = currentFoodSource
         self.ChildNodes = []
-        self.ChildNodesVisited = {}
+        self.ChildNodesVisited = set()
 
         
         self.PheromoneScore = 0

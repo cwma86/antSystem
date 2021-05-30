@@ -30,6 +30,7 @@ class Environment:
 
     def __runWorkerAnts(self, ants):
         shortest = float('inf')
+        logging.info("The first Worker Ant is creating the lookup dictionaries. This may take a while...")
         for ant in ants:
             while ant.CurrentFoodSource is not None:
                 trail = ant.move()
