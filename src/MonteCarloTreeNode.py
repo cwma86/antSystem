@@ -129,6 +129,14 @@ class MCTSNode:
                 strongestPheromoneFoodSource = targetFoodSource
                 strongestPheromoneScore = pheromoneScore
 
+        # If there were no pheromone trails from this food source, pick a raindom unvisited Trail
+        if strongestPheromoneFoodSource is None:
+            logging.info(f'Food Source ID: {currentFoodSource.FoodSourceId} has no Pheromone Trails from this point. Picking a random unvisited child node.')
+            unvisitedFoodSources = [unvisited for unvisited in [self.Environment.FoodSourceDict[self.Environment.get_target_foodsourceId(currentFoodSource, i)] for i in self.Environment.FoodSourceDistances[currentFoodSource]] if unvisited not in visitedFoodSources]
+            
+            if len(unvisitedFoodSources) > 0:
+                strongestPheromoneFoodSource = unvisitedFoodSources[random.randrange(0, len(unvisitedFoodSources))]
+
         return strongestPheromoneFoodSource
 
     def pick_unvisited_child(self):
@@ -149,9 +157,11 @@ class MCTSNode:
                 strongestChild = child
                 strongestChildPheromoneScore = child.get_pheromone_score()
 
+        # If there were no pheromone trails from this food source, pick a raindom unvisited child
         if strongestChild is None:
-            strongestChild = unvisitedChildren[random.randrange(0, len(unvisitedChildren))]
-
+            logging.info(f'Food Source ID: {self.CurrentFoodSource.FoodSourceId} has no Pheromone Trails from this point. Picking a random unvisited child node.')
+            if len(unvisitedChildren) > 0:
+                strongestChild = unvisitedChildren[random.randrange(0, len(unvisitedChildren))]
 
         logging.info(f'The strongest child of {self.CurrentFoodSource.FoodSourceId} is {strongestChild.CurrentFoodSource.FoodSourceId}')
         return strongestChild
