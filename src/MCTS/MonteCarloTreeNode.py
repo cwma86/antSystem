@@ -111,7 +111,7 @@ class MCTSNode:
             logging.error(f'TOUR SIZE: {len(tour)}')
 
         for i in range(len(tour) - 1):
-            totalLength += math.sqrt(self.Environment.find_trail_distance(tour[i], tour[i + 1]))
+            totalLength += self.Environment.find_trail_distance(tour[i], tour[i + 1])
         
         return totalLength
 
@@ -145,22 +145,43 @@ class MCTSNode:
         # Pick the unvisited Food Source with the highest pheromone score
         bestPheromoneTargets = self.Environment.find_best_pheromone_trails(currentFoodSourceId)
         bestPheromoneFoodSource = None
+        bestPheromoneFoodSourceId = None
         for bestPheromone in bestPheromoneTargets:
             foodSourceIdTarget = bestPheromone[0]
             if foodSourceIdTarget not in visitedFoodSources:
                 bestPheromoneFoodSource = self.Environment.FoodSourceDict[foodSourceIdTarget]
+                bestPheromoneFoodSourceId = foodSourceIdTarget
                 break
 
         # If there are no available pheromone trails from this food source, pick the closest unvisited food source
-        if bestPheromoneFoodSource is None:
-            closestTargetTrailTuples = self.Environment.find_closest_distances(currentFoodSourceId)
-            for closestTrail in closestTargetTrailTuples:
-                targetFoodSourceId = self.Environment.get_target_foodsourceId(currentFoodSourceId, closestTrail)
-                if targetFoodSourceId not in visitedFoodSources:
-                    bestPheromoneFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
-                    break
+        closestTargetTrailTuples = self.Environment.find_closest_distances(currentFoodSourceId)
+        closestFoodSource = None
+        closestFoodSourceId = None
+        for closestTrail in closestTargetTrailTuples:
+            targetFoodSourceId = self.Environment.get_target_foodsourceId(currentFoodSourceId, closestTrail)
+            if targetFoodSourceId not in visitedFoodSources:
+                closestFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
+                closestFoodSourceId = targetFoodSourceId
+                break
 
-        return bestPheromoneFoodSource
+        if bestPheromoneFoodSource is not None and closestFoodSource is None:
+            return bestPheromoneFoodSource
+        elif closestFoodSource is not None and bestPheromoneFoodSource is None:
+            return closestFoodSource
+        elif bestPheromoneFoodSource is not None and closestFoodSource is not None:
+            pheromoneDeviation = (
+                self.Environment.get_pheromone_score(currentFoodSourceId, bestPheromoneFoodSourceId)
+                - self.Environment.PheromoneScoreAverage
+            ) / self.Environment.PheromoneScoreStDev
+            distanceDeviation = -(
+                self.Environment.find_trail_distance(currentFoodSourceId, closestFoodSourceId)
+                - self.Environment.DistanceAverage
+            ) / self.Environment.DistanceStDev
+
+            if pheromoneDeviation > distanceDeviation:
+                return bestPheromoneFoodSource
+            else:
+                return closestFoodSource
 
     def fully_expanded(self):
         return len([i for i in self.ChildNodes.values() if i.get_visit_count() == 0])

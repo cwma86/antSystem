@@ -1,5 +1,7 @@
 import logging
-from math import log
+import numpy
+import math
+
 from WorkerAnt import WorkerAnt
 
 class Environment:
@@ -19,11 +21,17 @@ class Environment:
         self.PheromoneTrailsBestLookup = dict() # { FoodSourceId: list of Tuple(foodSourceId, pheromoneScore) }
 
         # Trail distance dictionary for fast distance lookup
-        self.FoodSourceDistanceLookup = dict() # { FoodSourceId: { FoodSourceId: distanceSquared } }
+        self.FoodSourceDistanceLookup = dict() # { FoodSourceId: { FoodSourceId: distance } }
 
-        # The possible paths to take for each Food Source, sorted by distance^2 descending
-        # We store the distance squared because it's much faster to create the lookup dictionaries than using math.sqrt().
-        self.FoodSourceDistances = dict() # { FoodSourceId: list of Tuple(foodSourceId, FoodSourceId, distanceSquared) }
+        # The possible paths to take for each Food Source, sorted by distance descending
+        self.FoodSourceDistances = dict() # { FoodSourceId: list of Tuple(foodSourceId, FoodSourceId, distance) }
+
+        # The standard deviations are used to determine whether to take the strongest pheromone
+        # trail or the trail to the closest food source
+        self.DistanceAverage = 0
+        self.DistanceStDev = 0
+        self.PheromoneScoreAverage = 0
+        self.PheromoneScoreStDev = 0
 
         self.__prepare_lookup_dictionaries()
 
@@ -100,6 +108,16 @@ class Environment:
             self.PheromoneTrailsBestLookup[foodSourceId].reverse()
         logging.info("Sort Best Pheromone Trails End")
 
+        pheromoneScores = numpy.array([])
+        for foodSourceId in self.PheromoneTrailsBestLookup:
+            pheromones = [i[1] for i in self.PheromoneTrailsBestLookup[foodSourceId] if i[1] > 0]
+            if len(pheromones) > 0:
+                pheromoneScores = numpy.append(pheromoneScores, pheromones)
+        self.PheromoneScoreAverage = pheromoneScores.sum() / len(pheromoneScores)
+        self.PheromoneScoreStDev = pheromoneScores.std()
+        logging.info(f'Pheromone Score Average: {self.PheromoneScoreAverage}')
+        logging.info(f'Pheromone Score STD: {self.PheromoneScoreStDev}')
+
         return self.PheromoneTrails
 
     def __mark_trail(self, pheromoneTrail):
@@ -155,11 +173,11 @@ class Environment:
             for j in range(i + 1, len(self.FoodSources)):
                 
                 foodSource2 = self.FoodSources[j]
-                distanceSquared = (foodSource1.XPos - foodSource2.XPos) ** 2 + (foodSource1.YPos - foodSource2.YPos) ** 2
+                distance = math.sqrt((foodSource1.XPos - foodSource2.XPos) ** 2 + (foodSource1.YPos - foodSource2.YPos) ** 2)
 
                 if foodSource1.FoodSourceId not in self.FoodSourceDistanceLookup:
                     self.FoodSourceDistanceLookup[foodSource1.FoodSourceId] = dict()
-                self.FoodSourceDistanceLookup[foodSource1.FoodSourceId][foodSource2.FoodSourceId] = distanceSquared
+                self.FoodSourceDistanceLookup[foodSource1.FoodSourceId][foodSource2.FoodSourceId] = distance
         logging.info("Food Source Distance Lookup Generation End")
 
         # Store all trails and their distance from each food source
@@ -182,9 +200,9 @@ class Environment:
                     foodSourceId1 = foodSource2.FoodSourceId
                     foodSourceId2 = foodSource1.FoodSourceId
 
-                distanceSquared = self.FoodSourceDistanceLookup[foodSourceId1][foodSourceId2]
+                distance = self.FoodSourceDistanceLookup[foodSourceId1][foodSourceId2]
 
-                trailDistanceTuple = (foodSourceId1, foodSourceId2, distanceSquared)
+                trailDistanceTuple = (foodSourceId1, foodSourceId2, distance)
                 self.FoodSourceDistances[foodSource1.FoodSourceId].append(trailDistanceTuple)
         logging.info("Trail Distance Tuple Generation End")
 
@@ -206,3 +224,12 @@ class Environment:
 
                 self.PheromoneTrails[foodSource1.FoodSourceId][foodSource2.FoodSourceId] = 0
         logging.info("Pheromone Trail initialization End")
+
+        distances = numpy.array([])
+        for foodSourceId in self.FoodSourceDistances:
+            distances = numpy.append(distances, [i[2] for i in self.FoodSourceDistances[foodSourceId]])
+        logging.info(f'Distances Values: {distances}')
+        self.DistanceAverage = distances.sum() / len(distances)
+        self.DistanceStDev = distances.std()
+        logging.info(f'Distance Average: {self.DistanceAverage}')
+        logging.info(f'Distance STD: {self.DistanceStDev}')
