@@ -52,7 +52,7 @@ class Environment:
             if (length < shortest):
                 shortest = length
                 self.bestAnt = ant
-        print("Ant Shortest Trail Length", shortest)
+        logging.info(f"Ant Shortest Trail Length: {shortest}")
 
         # Validate Food Source Distances
         for foodSource in self.FoodSources:
