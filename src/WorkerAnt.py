@@ -1,4 +1,3 @@
-import logging
 import random
 import math
 
@@ -14,16 +13,13 @@ class WorkerAnt:
         self.ShuffleCountdown = 5
 
     def move(self):
-        # This will fully execute for only the first Worker Ant on only its first move.
-        self.build_lookup_dictionaries()
-
         trailTuple = self.find_nearest_foodsource()
 
         if trailTuple is None:
             self.CurrentFoodSource = None
             return None
 
-        targetFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource, trailTuple)
+        targetFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource.FoodSourceId, trailTuple)
         targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
 
         self.CurrentFoodSource = targetFoodSource
@@ -38,9 +34,9 @@ class WorkerAnt:
 
 
         # Find the nearest unvisited food source
-        trailDistanceList = self.Environment.FoodSourceDistances[self.CurrentFoodSource]
+        trailDistanceList = self.Environment.FoodSourceDistances[self.CurrentFoodSource.FoodSourceId]
         for trail in trailDistanceList:
-            targetFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource, trail)
+            targetFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource.FoodSourceId, trail)
             targetFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
             if targetFoodSource not in self.VisitedFoodSources:
                 nearestFoodSourceTrailTuple = trail
@@ -70,7 +66,7 @@ class WorkerAnt:
         # Subsequent Worker ants will act a lot faster because of these dictionaries.
         # The down side is that this block, building these lookup dictionaries
         # takes a cumulatively long time on large graphs (read: pla85900.tsp)
-        if self.CurrentFoodSource not in self.Environment.FoodSourceDistances:
+        if self.CurrentFoodSource.FoodSourceId not in self.Environment.FoodSourceDistances:
             trailList = list()
 
             # Shuffle the Food Source list every 5 Worker Ant steps for variance.
@@ -126,4 +122,4 @@ class WorkerAnt:
             # sorted by distance into a dictionary for later use.
             # This way distances between any two food sources will 
             # need to be calculated only one time for the entire run.
-            self.Environment.FoodSourceDistances[self.CurrentFoodSource] = trailList
+            self.Environment.FoodSourceDistances[self.CurrentFoodSource.FoodSourceId] = trailList
