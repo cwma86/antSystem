@@ -26,7 +26,20 @@ for providing a different data file
 ./src/antSystem.py --filename <path to file>
 ```
 
-## Min-max Ant Colony optimization
+## MCTS Ant Colony optimization
+
+```bash
+./src/Runner/runTspFile.py --filename TSPData/pcb10_test.tsp  --MCTS
+```
+
+## Min-Max Ant Colony optimization
+This Algorithm was developed as a comparision mechanism for our MCTS ant colony optimization problem
+
+Warning: due to run time complexity, This algorithmn should be limited to solving TSP data sets of about 50 nodes
+```bash
+./src/Runner/runTspFile.py --filename TSPData/pcb10_test.tsp  --MMAS
+```
+## Ant Colony optimization
 This Algorithm was developed as a comparision mechanism for our MCTS ant colony optimization problem
 
 Warning: due to run time complexity, This algorithmn should be limited to solving TSP data sets of about 50 nodes
