@@ -69,7 +69,7 @@ class Underling:
         # logging.info(f'Root BEST: {mcts.BestTourDistance}')
         # logging.info('')
 
-        mcts = MCTSNode(self.Environment, None, self.CurrentFoodSource, [self.CurrentFoodSource.FoodSourceId])
+        mcts = MCTSNode(self.Environment, None, self.CurrentFoodSource)
 
         logging.info('Root Node Initial Info')
         logging.info(f'Root Food Source ID: {mcts.get_foodsource().FoodSourceId}')
@@ -77,10 +77,10 @@ class Underling:
         logging.info(f'Root BEST: {mcts.BestTourDistance}')
         logging.info('')
 
-        resources = 2000
+        resources = 4000
         while resources > 0:
 
-            if(resources % 10 == 0):
+            if(resources % 400 == 0):
                 selectedNode = mcts.select() #Expansion is included in this step
                 logging.info('Selected Node Initial Info')
                 logging.info(f'Selected Food Source ID: {selectedNode.get_foodsource().FoodSourceId}')
@@ -103,3 +103,9 @@ class Underling:
                 selectedNode.propagate(tourScore)
             
             resources -= 1
+
+        logging.info('Root Node Info after MCTS')
+        logging.info(f'Root Food Source ID: {mcts.get_foodsource().FoodSourceId}')
+        logging.info(f'Root AVG: {mcts.AverageTourDistance}')
+        logging.info(f'Root BEST: {mcts.BestTourDistance}')
+        logging.info('')

@@ -3,7 +3,7 @@ import math
 import random
 
 class MCTSNode:
-    def __init__(self, environment, parent, currentFoodSource, ongoingTour = set()):
+    def __init__(self, environment, parent, currentFoodSource, ongoingTour = list()):
 
         self.Environment = environment
         self.RunCount = 0
@@ -11,11 +11,11 @@ class MCTSNode:
 
         self.Parent = parent
 
-        self.OngoingTour = ongoingTour
+        self.OngoingTour = list(ongoingTour)
+        self.OngoingTour.append(currentFoodSource.FoodSourceId)
 
         # Append the given food source to the tour.
-        self.VisitedNodes = set(ongoingTour)
-        self.VisitedNodes.add(currentFoodSource.FoodSourceId)
+        self.VisitedNodes = set(self.OngoingTour)
 
         self.CurrentFoodSource = currentFoodSource
         self.ChildNodes = dict()
@@ -33,7 +33,6 @@ class MCTSNode:
 
     def select(self):
         if len(self.ChildNodes) == 0:
-            logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} is populating its children')
             self.populate_children()
 
         if not self.IsFullyExpanded:
@@ -51,16 +50,16 @@ class MCTSNode:
         return self.find_best_child().select()
 
     def rollout(self):
-        # Track this node's visited food sources as we simulate the tour
-        rolloutVisitedNodes = set(self.VisitedNodes)
-
         # Navigate unvisited food sources along the trails with the strongest Pheromones
         # until all Food Sources have been visited.
-        rolloutTour = list(self.VisitedNodes)
+        rolloutTour = list(self.OngoingTour)
+
+        # Track this node's visited food sources as we simulate the tour
+        rolloutVisitedNodes = set(rolloutTour)
 
         # Find the strongest unvisited pheromone trail from this point
-        currentFoodSourceId = self.CurrentFoodSource.FoodSourceId
-        nextFoodSource = self.find_foodsource_from_strongest_unvisited_pheromone_trail(currentFoodSourceId, rolloutVisitedNodes)
+        currentFoodSource = self.CurrentFoodSource
+        nextFoodSource = self.find_foodsource_from_strongest_unvisited_pheromone_trail(currentFoodSource.FoodSourceId, rolloutVisitedNodes)
 
         while nextFoodSource is not None:
             rolloutTour.append(nextFoodSource.FoodSourceId)
@@ -81,20 +80,19 @@ class MCTSNode:
         currentNode.AverageTourDistance = rolloutScore
         currentNode.VisitCount = 1
 
+        if(currentNode.Parent is not None):
+            currentNode.Parent.ChildNodesVisited.add(currentNode.get_foodsource().FoodSourceId)
+
         parent = currentNode.Parent
         while parent is not None:
             # propagate the best tour distance to the parent
             if currentNode.BestTourDistance < parent.BestTourDistance:
                 parent.BestTourDistance = currentNode.BestTourDistance
 
-            # Add the current node to the parent's visited nodes
-            if currentNode not in parent.ChildNodesVisited:
-                parent.ChildNodesVisited.add(currentNode)
-
             # Calculate the parent's new average tour distance
             summedChildScores = 0
-            for visitedNode in parent.ChildNodesVisited:
-                summedChildScores += visitedNode.AverageTourDistance
+            for childFoodSourceId in parent.ChildNodesVisited:
+                summedChildScores += parent.ChildNodes[childFoodSourceId].AverageTourDistance
 
             parent.AverageTourDistance = summedChildScores / len(parent.ChildNodesVisited)
             
@@ -123,8 +121,10 @@ class MCTSNode:
     def pick_unvisited_child(self):
         bestUnvisitedFoodSource = self.__find_best_pheromone_or_closest_foodsource()
 
-        node = self.ChildNodes[bestUnvisitedFoodSource.FoodSourceId]
+        if bestUnvisitedFoodSource is None:
+            return None
 
+        node = self.ChildNodes[bestUnvisitedFoodSource.FoodSourceId]
         return node
 
     def __find_best_pheromone_or_closest_foodsource(self, currentFoodSourceId = None, visitedFoodSources = None):
@@ -136,12 +136,11 @@ class MCTSNode:
             currentFoodSourceId = self.CurrentFoodSource.FoodSourceId
             
             # Mark the children of this Node already rolled out by the MCTS as visited
-            visitedFoodSources = set([foodSourceId for foodSourceId in self.ChildNodes if self.ChildNodes[foodSourceId].get_visit_count() != 0])
+            visitedFoodSources = set([childFoodSourceId for childFoodSourceId in self.ChildNodes if self.ChildNodes[childFoodSourceId].get_visit_count() != 0])
             
             # Include the food sources in the existing tour as visited.
             for tourStop in self.OngoingTour:
                 visitedFoodSources.add(tourStop)
-
 
         # Pick the unvisited Food Source with the highest pheromone score
         bestPheromoneTargets = self.Environment.find_best_pheromone_trails(currentFoodSourceId)
@@ -161,10 +160,6 @@ class MCTSNode:
                     bestPheromoneFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
                     break
 
-        # If there were no pheromone trails from this food source, log an error
-        if bestPheromoneFoodSource is None:
-            logging.error(f'Food Source ID: {currentFoodSourceId} has no available trails from this point.')
-
         return bestPheromoneFoodSource
 
     def fully_expanded(self):
@@ -173,7 +168,7 @@ class MCTSNode:
     def find_best_child(self):
         bestChild = None
         bestChildScore = 0
-        for child in self.ChildNodes:
+        for child in self.ChildNodes.values():
             childScore = child.upper_confidence_bound()
             if childScore > bestChildScore:
                 bestChild = child
