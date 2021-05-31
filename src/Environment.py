@@ -13,13 +13,13 @@ class Environment:
         self.FoodSourceDict = dict() # { FoodSourceId: FoodSource }
 
         # The pheromone trails and the strengths
-        self.PheromoneTrails = dict() #{ Tuple(foodSourceId, FoodSourceId): pheromoneScore }
+        self.PheromoneTrails = dict() #{ FoodSourceId: { FoodSourceId: pheromoneScore } }
 
         # Trail distance dictionary for fast distance lookup
-        self.FoodSourceDistanceLookup = dict() # {FoodSourceId: {FoodSourceId: distanceSquared}}
+        self.FoodSourceDistanceLookup = dict() # { FoodSourceId: { FoodSourceId: distanceSquared } }
 
         # Trail distance list for closest distance lookup.
-        self.FoodSourceDistances = dict() #{FoodSourceId: list of Tuple(foodSourceId, FoodSourceId, distanceSquared)}
+        self.FoodSourceDistances = dict() #{ FoodSourceId: list of Tuple(foodSourceId, FoodSourceId, distanceSquared) }
 
         self.__prepare_lookup_dictionaries()
 
@@ -59,8 +59,8 @@ class Environment:
             if foodSource.FoodSourceId not in self.FoodSourceDistances:
                 logging.error(f'Food Source ID {foodSource.FoodSourceId} not present in the distance list')
 
-        logging.info(f'Non-zero Pheromone Trails: {len([i for i in self.PheromoneTrails if self.PheromoneTrails[i] != 0])}')
-        logging.info(f'Zero Pheromone Trails: {len([i for i in self.PheromoneTrails if self.PheromoneTrails[i] == 0])}')
+        logging.info(f'Non-zero Pheromone Trails: {sum([len([i for i in d if d[i] != 0]) for d in [self.PheromoneTrails[i] for i in self.PheromoneTrails]])}')
+        logging.info(f'Zero Pheromone Trails: {sum([len([i for i in d if d[i] == 0]) for d in [self.PheromoneTrails[i] for i in self.PheromoneTrails]])}')
 
         return self.PheromoneTrails
 
@@ -74,7 +74,7 @@ class Environment:
         if pheromoneTrail[1] == pheromoneTrail[0]:
             logging.error('Invalid matched Pheromone Trail')
 
-        self.PheromoneTrails[trailTuple] = self.PheromoneTrails[trailTuple] + 1
+        self.PheromoneTrails[pheromoneTrail[0]][pheromoneTrail[1]] = self.PheromoneTrails[pheromoneTrail[0]][pheromoneTrail[1]] + 1
 
     # Since the Food Sources in the Trail Tuples are sorted by ID to make
     # A -> B and B -> A the same trail, we need this method to determine
@@ -88,13 +88,10 @@ class Environment:
         return None
 
     def get_pheromone_score(self, foodSourceId1, foodSourceId2):
-        trailTuple = None
         if foodSourceId1 < foodSourceId2:
-            trailTuple = (foodSourceId1, foodSourceId2)
+            return self.PheromoneTrails[foodSourceId1][foodSourceId2]
         else:
-            trailTuple = (foodSourceId2, foodSourceId1)
-
-        return self.PheromoneTrails[trailTuple]
+            return self.PheromoneTrails[foodSourceId2][foodSourceId1]
 
     def find_trail_distance(self, foodSourceId1, foodSourceId2):
         if foodSourceId1 < foodSourceId2:
@@ -107,17 +104,18 @@ class Environment:
         self.FoodSourceDict = {f.FoodSourceId : f for f in self.FoodSources}
 
         # Store the distances between all food sources in a quick lookup dictionary
-        logging.info("Food Source Lookup Generation Begin")
+        logging.info("Food Source Distance Lookup Generation Begin")
         for i in range(len(self.FoodSources) - 1):
+            foodSource1 = self.FoodSources[i]
             for j in range(i + 1, len(self.FoodSources)):
-                foodSource1 = self.FoodSources[i]
+                
                 foodSource2 = self.FoodSources[j]
                 distanceSquared = (foodSource1.XPos - foodSource2.XPos) ** 2 + (foodSource1.YPos - foodSource2.YPos) ** 2
 
                 if foodSource1.FoodSourceId not in self.FoodSourceDistanceLookup:
                     self.FoodSourceDistanceLookup[foodSource1.FoodSourceId] = dict()
                 self.FoodSourceDistanceLookup[foodSource1.FoodSourceId][foodSource2.FoodSourceId] = distanceSquared
-        logging.info("Food Source Lookup Generation End")
+        logging.info("Food Source Distance Lookup Generation End")
 
         # Store all trails and their distance from each food source
         logging.info("Trail Distance Tuple Generation Begin")
@@ -158,7 +156,8 @@ class Environment:
                 foodSource1 = self.FoodSources[i]
                 foodSource2 = self.FoodSources[j]
 
-                trailTuple = (foodSource1.FoodSourceId, foodSource2.FoodSourceId)
+                if foodSource1.FoodSourceId not in self.PheromoneTrails:
+                    self.PheromoneTrails[foodSource1.FoodSourceId] = dict()
 
-                self.PheromoneTrails[trailTuple] = 0
+                self.PheromoneTrails[foodSource1.FoodSourceId][foodSource2.FoodSourceId] = 0
         logging.info("Pheromone Trail initialization End")
