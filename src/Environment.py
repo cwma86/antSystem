@@ -15,12 +15,14 @@ class Environment:
         # The pheromone trails and the strengths
         self.PheromoneTrails = dict() # { FoodSourceId: { FoodSourceId: pheromoneScore } }
 
-        self.PheromoneTrailsBestLookup = dict() # { FoodSourceId: list of Tuple(foodSourceId, foodSourceId, pheromoneScore) }
+        # The possible Pheromone Trails for each Food Source, sorted by strongest Pheromone Score descending
+        self.PheromoneTrailsBestLookup = dict() # { FoodSourceId: list of Tuple(foodSourceId, pheromoneScore) }
 
         # Trail distance dictionary for fast distance lookup
         self.FoodSourceDistanceLookup = dict() # { FoodSourceId: { FoodSourceId: distanceSquared } }
 
-        # Trail distance list for closest distance lookup.
+        # The possible paths to take for each Food Source, sorted by distance^2 descending
+        # We store the distance squared because it's much faster to create the lookup dictionaries than using math.sqrt().
         self.FoodSourceDistances = dict() # { FoodSourceId: list of Tuple(foodSourceId, FoodSourceId, distanceSquared) }
 
         self.__prepare_lookup_dictionaries()
@@ -87,14 +89,14 @@ class Environment:
                 pheromoneScore = self.PheromoneTrails[foodSourceId1][foodSourceId2]
 
                 if pheromoneScore > 0:
-                    pheromoneScoreTuple = (foodSourceId1, foodSourceId2, pheromoneScore)
+                    pheromoneScoreTuple = (foodSourceId2, pheromoneScore)
                     self.PheromoneTrailsBestLookup[foodSource1.FoodSourceId].append(pheromoneScoreTuple)
         logging.info("Generating dictionary of sorted pheromone trails End")
 
         # Sort all the pheromone tuples by score descending
         logging.info("Sort Best Pheromone Trails Begin...")
         for foodSourceId in self.PheromoneTrailsBestLookup:
-            self.PheromoneTrailsBestLookup[foodSourceId].sort(key= lambda t: t[2])
+            self.PheromoneTrailsBestLookup[foodSourceId].sort(key= lambda t: t[1])
             self.PheromoneTrailsBestLookup[foodSourceId].reverse()
         logging.info("Sort Best Pheromone Trails End")
 
@@ -134,6 +136,13 @@ class Environment:
             return self.FoodSourceDistanceLookup[foodSourceId1][foodSourceId2]
         else:
             return self.FoodSourceDistanceLookup[foodSourceId2][foodSourceId1]
+
+    def find_best_pheromone_trails(self, foodSourceId):
+        pheromoneList = self.PheromoneTrailsBestLookup[foodSourceId]
+        return pheromoneList
+
+    def find_closest_distances(self, foodSourceId):
+        return self.FoodSourceDistances[foodSourceId]
 
     def __prepare_lookup_dictionaries(self):
         # Organize the food sources into a quick lookup dictionary
