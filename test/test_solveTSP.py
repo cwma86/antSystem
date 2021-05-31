@@ -20,33 +20,39 @@ logging.basicConfig(
             level=logging.INFO)
 
 dataPath = os.path.join(script_path, '..', 'TSPData')
-  
+
+class Arg:
+  def __init__(self):
+    self.filename = ""
+    self.Brute = False
+    self.AntSystem = True
+    self.MCTS = False
+    self.MMAS = False
+
 class test_solveTSP(unittest.TestCase):
-  # def test_solveTSP(self):
-  #   parser = argparse.ArgumentParser(description='Run Ant System')   
-  #   args = parser.parse_args()
-  #   filePath = os.path.join(dataPath,'pcb10_test.tsp')
-  #   args.filename = filePath
-  #   args.Brute = True
-  #   args.AntSystem = False
-  #   args.MCTS = False
-  #   args.MMAS = False
-  #   failCount = 0 
-  #   numberOfRuns = 1
-  #   now = datetime.datetime.now()
-  #   for i in range(numberOfRuns):
-  #     bestSolution, bestDist = solveTSP(args)
-  #     if not math.isclose(bestDist, 638.108, abs_tol=0.001):
-  #       failCount +=1
-  #       logging.info(f"Incorrect path bestDist: {bestDist}")
-  #   avgCorrect = (numberOfRuns-failCount)/numberOfRuns*100
-  #   print(f"average correct solution {avgCorrect}%")
-  #   self.assertAlmostEqual(avgCorrect, 100.0)
+  def test_solveTSP(self):
+    args = Arg()
+    filePath = os.path.join(dataPath,'pcb10_test.tsp')
+    args.filename = filePath
+    args.Brute = True
+    args.AntSystem = False
+    args.MCTS = False
+    args.MMAS = False
+    failCount = 0 
+    numberOfRuns = 1
+    now = datetime.datetime.now()
+    for i in range(numberOfRuns):
+      bestSolution, bestDist = solveTSP(args)
+      if not math.isclose(bestDist, 638.108, abs_tol=0.001):
+        failCount +=1
+        logging.info(f"Incorrect path bestDist: {bestDist}")
+    avgCorrect = (numberOfRuns-failCount)/numberOfRuns*100
+    print(f"average correct solution {avgCorrect}%")
+    self.assertAlmostEqual(avgCorrect, 100.0)
 
 
   def test_solveTSPAnt(self):
-    parser = argparse.ArgumentParser(description='Run Ant System')   
-    args = parser.parse_args()
+    args = Arg()
     filePath = os.path.join(dataPath,'lin12.tsp')
     args.filename = filePath
     args.Brute = False
@@ -63,15 +69,14 @@ class test_solveTSP(unittest.TestCase):
         logging.info(f"Incorrect path bestDist: {bestDist}")
     finalTime = datetime.datetime.now()
     timeDelta = finalTime - initTime
-    avgRunTime = timeDelta/ numberOfRuns
+    avgRunTime = timeDelta / numberOfRuns
     avgCorrect = (numberOfRuns-failCount)/numberOfRuns*100
     logging.info(f"average AS time per run {avgRunTime}seconds")
     logging.info(f"average AS correct solution {avgCorrect}%")
-    self.assertGreaterEqual(avgCorrect, 80)
+    self.assertGreaterEqual(avgCorrect, 70)
 
   def test_solveTSPMMAnt(self):
-    parser = argparse.ArgumentParser(description='Run Ant System')   
-    args = parser.parse_args()
+    args = Arg()
     filePath = os.path.join(dataPath,'lin12.tsp')
     args.filename = filePath
     args.Brute = False
