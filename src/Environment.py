@@ -13,13 +13,15 @@ class Environment:
         self.FoodSourceDict = dict() # { FoodSourceId: FoodSource }
 
         # The pheromone trails and the strengths
-        self.PheromoneTrails = dict() #{ FoodSourceId: { FoodSourceId: pheromoneScore } }
+        self.PheromoneTrails = dict() # { FoodSourceId: { FoodSourceId: pheromoneScore } }
+
+        self.PheromoneTrailsBestLookup = dict() # { FoodSourceId: list of Tuple(foodSourceId, foodSourceId, pheromoneScore) }
 
         # Trail distance dictionary for fast distance lookup
         self.FoodSourceDistanceLookup = dict() # { FoodSourceId: { FoodSourceId: distanceSquared } }
 
         # Trail distance list for closest distance lookup.
-        self.FoodSourceDistances = dict() #{ FoodSourceId: list of Tuple(foodSourceId, FoodSourceId, distanceSquared) }
+        self.FoodSourceDistances = dict() # { FoodSourceId: list of Tuple(foodSourceId, FoodSourceId, distanceSquared) }
 
         self.__prepare_lookup_dictionaries()
 
@@ -40,7 +42,7 @@ class Environment:
     def __runWorkerAnts(self, ants):
         shortest = float('inf')
 
-        logging.info("The Worker Ants are now laying Pheromone Trails")
+        logging.info("The Worker Ants are now laying Pheromone Trails...")
         for ant in ants:
             while ant.CurrentFoodSource is not None:
                 trail = ant.move()
@@ -61,6 +63,40 @@ class Environment:
 
         logging.info(f'Non-zero Pheromone Trails: {sum([len([i for i in d if d[i] != 0]) for d in [self.PheromoneTrails[i] for i in self.PheromoneTrails]])}')
         logging.info(f'Zero Pheromone Trails: {sum([len([i for i in d if d[i] == 0]) for d in [self.PheromoneTrails[i] for i in self.PheromoneTrails]])}')
+
+        # Store all the pheromone trails as sortable lists for each food source
+        logging.info("Generating dictionary of sorted pheromone trails for each food source...")
+        for foodSource1 in self.FoodSources:
+            if foodSource1.FoodSourceId not in self.PheromoneTrailsBestLookup:
+                self.PheromoneTrailsBestLookup[foodSource1.FoodSourceId] = list()
+
+            for foodSource2 in self.FoodSources:
+                if foodSource1 == foodSource2:
+                    continue
+                
+                # Ensure the proper ascending order of the Food Source Id
+                foodSourceId1 = None
+                foodSourceId2 = None
+                if foodSource1.FoodSourceId < foodSource2.FoodSourceId:
+                    foodSourceId1 = foodSource1.FoodSourceId
+                    foodSourceId2 = foodSource2.FoodSourceId
+                else:
+                    foodSourceId1 = foodSource2.FoodSourceId
+                    foodSourceId2 = foodSource1.FoodSourceId
+
+                pheromoneScore = self.PheromoneTrails[foodSourceId1][foodSourceId2]
+
+                if pheromoneScore > 0:
+                    pheromoneScoreTuple = (foodSourceId1, foodSourceId2, pheromoneScore)
+                    self.PheromoneTrailsBestLookup[foodSource1.FoodSourceId].append(pheromoneScoreTuple)
+        logging.info("Generating dictionary of sorted pheromone trails End")
+
+        # Sort all the pheromone tuples by score descending
+        logging.info("Sort Best Pheromone Trails Begin...")
+        for foodSourceId in self.PheromoneTrailsBestLookup:
+            self.PheromoneTrailsBestLookup[foodSourceId].sort(key= lambda t: t[2])
+            self.PheromoneTrailsBestLookup[foodSourceId].reverse()
+        logging.info("Sort Best Pheromone Trails End")
 
         return self.PheromoneTrails
 
@@ -104,7 +140,7 @@ class Environment:
         self.FoodSourceDict = {f.FoodSourceId : f for f in self.FoodSources}
 
         # Store the distances between all food sources in a quick lookup dictionary
-        logging.info("Food Source Distance Lookup Generation Begin")
+        logging.info("Food Source Distance Lookup Generation Begin...")
         for i in range(len(self.FoodSources) - 1):
             foodSource1 = self.FoodSources[i]
             for j in range(i + 1, len(self.FoodSources)):
@@ -118,7 +154,7 @@ class Environment:
         logging.info("Food Source Distance Lookup Generation End")
 
         # Store all trails and their distance from each food source
-        logging.info("Trail Distance Tuple Generation Begin")
+        logging.info("Trail Distance Tuple Generation Begin...")
         for foodSource1 in self.FoodSources:
             if foodSource1.FoodSourceId not in self.FoodSourceDistances:
                 self.FoodSourceDistances[foodSource1.FoodSourceId] = list()
@@ -144,13 +180,13 @@ class Environment:
         logging.info("Trail Distance Tuple Generation End")
 
         # Sort all the distance tuples by distance ascending
-        logging.info("Sort Trail Distance Begin")
+        logging.info("Sort Trail Distance Begin...")
         for foodSourceId in self.FoodSourceDistances:
             self.FoodSourceDistances[foodSourceId].sort(key= lambda t: t[2])
         logging.info("Sort Trail Distance End")
 
         # Initialize the Pheromone Trail strength dictionary
-        logging.info("Pheromone Trail initialization Begin")
+        logging.info("Pheromone Trail initialization Begin...")
         for i in range(len(self.FoodSources) - 1):
             for j in range(i + 1, len(self.FoodSources)):
                 foodSource1 = self.FoodSources[i]
