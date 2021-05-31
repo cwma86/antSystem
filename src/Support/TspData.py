@@ -16,7 +16,7 @@ class TspData:
     self.edgeWeight = edgeWeight
     self.nodes = nodes
     self.cost = SymetricMatrix(self.dimension, initialValue=float("inf"))
-    self.pheromone = SymetricMatrix(self.dimension, initialValue=0.0)
+    self.pheromone = SymetricMatrix(self.dimension, initialValue=0.000001)
  
 
   def header_to_string(self):
@@ -54,7 +54,13 @@ class TspData:
   def evaporate_pheromone(self, decay):
     ''' uses index 1 matrix locations'''
     for node in self.pheromone.matrix:
-      node = (1-decay) * node    
+      node = decay * node    
+
+  def adjust_max_pheromone(self, maxValue):
+    ''' uses index 1 matrix locations'''
+    for node in self.pheromone.matrix:
+      if node > maxValue:
+        node = maxValue    
 
   def set_pheromone(self, fromIndex, to, value):
     self.pheromone.set_value(fromIndex, to, value)
@@ -81,5 +87,23 @@ def calculate_path_distance(solution, tspData):
     # add the distance back to the initial node
     distance += tspData.get_cost_distance(firstNode, currNode)
     return distance
+
+def calculate_pheromone_sum(solution, tspData):
+    pheroSum = 0
+    firstNode = None
+    currNode = None
+    prevNode = None
+    for node in solution:
+      if prevNode == None:
+        firstNode = node
+        prevNode = firstNode
+        continue
+      currNode = node
+      pheroSum += tspData.get_pheromone(currNode, prevNode)
+      prevNode = currNode
+    # add the pheroSum back to the initial node
+    pheroSum += tspData.get_pheromone(firstNode, currNode)
+    return pheroSum
+
 
 

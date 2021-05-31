@@ -1,3 +1,4 @@
+import sys
 import multiprocessing
 import logging
 
@@ -29,7 +30,11 @@ class SymetricMatrix():
     row -= 1
     col -= 1
     index = self._get_index(row, col)
-    value = self.matrix[index]
+    try:
+      value = self.matrix[index]
+    except IndexError:
+      logging.error(f"row: {row} col {col}")
+      raise IndexError
     return value
 
   def set_value(self, row, col, value):
@@ -39,10 +44,14 @@ class SymetricMatrix():
     self.matrix[index] = value 
 
   def to_string(self):
-    outStr = ""
+    outStr = "\n   "
     for i in range(1, self.size+1):
+      outStr += f"{i:10d} "
+    outStr += "\n"
+    for i in range(1, self.size+1):
+      outStr += f"{i:2d}   "
       for j in range(1, self.size+1):
-        outStr += (f"{self.get_value(i,j):.4f} ")
+        outStr += (f"{self.get_value(i,j):10.4f} ")
       outStr += (f"\n")
     return outStr
 

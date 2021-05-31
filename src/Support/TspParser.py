@@ -56,7 +56,7 @@ def parse_header(tspFile, tspData):
     # Node section (not data just skip)     
   line = tspFile.readline().split(":")
   tspData = TspData(name, comment, type,
-               dimension, edgeWeight)
+               dimension, edgeWeight, nodes=[])
   logging.debug(tspData.header_to_string())
   return tspData
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import logging
+import math
 import os
 import sys
 
@@ -11,11 +12,20 @@ sys.path.insert(1, support_dir)
 from SymetricMatrix import SymetricMatrix
 from TspParser import TspParser
 
-# MMAS imports
-MMAS_dir = os.path.join(script_path, "..","MMAS")
-sys.path.insert(1, MMAS_dir)
-from MMAS import MMAS
-script_path = os.path.dirname(os.path.abspath( __file__ ))
+# AntSystem imports
+AntSystem_dir = os.path.join(script_path, "..","AntSystem")
+sys.path.insert(1, AntSystem_dir)
+from AntSystem import AntSystem
+
+# Min Max AntSystem imports
+AntSystem_dir = os.path.join(script_path, "..","MMAntSystem")
+sys.path.insert(1, AntSystem_dir)
+from MMAntSystem import MMAntSystem
+
+# MSTS AntSystem imports
+MCTS_dir = os.path.join(script_path, "..","MCTS")
+sys.path.insert(1, MCTS_dir)
+from MonteCarloAntColony import MonteCarloAntColony
 
 # Brute Force imports
 Brute_dir = os.path.join(script_path, "..","BruteForce")
@@ -31,6 +41,8 @@ def args():
                       help='verbose logging')
   parser.add_argument('--MCTS', action='store_true', default=True,
                       help='Run Monte Carlo Tree Search Algorithm (default)')
+  parser.add_argument('--AntSystem', action='store_true',
+                      help='Run Ant Colony Optimization Algorithm')
   parser.add_argument('--MMAS', action='store_true',
                       help='Run Min-Max Ant Colony Optimization Algorithm')
   parser.add_argument('--Brute', action='store_true',
@@ -52,21 +64,29 @@ def args():
   logging.info(f"logging set to {logging.DEBUG}")
   if args.Brute:
     logging.info("Running brute force algorithm")
-    args.MMAS = False
+    args.AntSystem = False
     args.MCTS = False
+    args.MMAS = False
+  elif args.AntSystem:
+    logging.info("Running Ant Colony Optimization algorithm")
+    args.Brute = False
+    args.MCTS = False
+    args.MMAS = False
   elif args.MMAS:
     logging.info("Running Min-Max Ant Colony Optimization algorithm")
+    args.AntSystem = False
     args.Brute = False
     args.MCTS = False
   else:
     logging.info("Running Monte Carlo Tree Search Ant Colony Optimization algorithm")
-    args.MMAS = False
+    args.AntSystem = False
     args.Brute = False
+    args.MMAS = False
  
   return args
 
 
-def main(inputargs):
+def solveTSP(inputargs):
   # Get data from file
   tspData = TspParser(inputargs.filename)
   logging.debug(f"{len(tspData.nodes)} nodes created")
@@ -75,20 +95,56 @@ def main(inputargs):
   bestDist = 0
   if inputargs.Brute:
     bestSolution, bestDist = brute_force_solution(tspData)  
-  elif inputargs.MMAS:
+  elif inputargs.AntSystem:
     # Algorith Tuning
-    numAttempts = tspData.dimension * tspData.dimension
-    #numAttempts = int(tspData.dimension * 5 * math.log(tspData.dimension) // 1)
-    #numAttempts = tspData.dimension
     numOfAnts = tspData.dimension
     if numOfAnts < 2:
       numOfAnts = 2 
-    bestSolution, bestDist = MMAS(tspData, numOfAnts=numOfAnts, 
+    numAttempts = tspData.dimension * tspData.dimension
+    #numAttempts = int(tspData.dimension * 5 * math.log(tspData.dimension) // 1)
+    #numAttempts = tspData.dimension
+    antSystem = AntSystem(tspData, numOfAnts=numOfAnts, 
                                   numberOfAttempts=numAttempts, 
-                                  pheromoneDecay=0.2)
+                                  pheromoneDecay=0.99)
+    bestSolution = antSystem.bestSolution
+    bestDist = antSystem.bestDist
+
+  elif inputargs.MMAS:
+    # Algorith Tuning
+    numOfAnts = tspData.dimension
+    if numOfAnts < 2:
+      numOfAnts = 2 
+    #numAttempts = tspData.dimension * tspData.dimension
+    numAttempts = int( tspData.dimension * math.log(tspData.dimension) )
+    #numAttempts = tspData.dimension
+    antSystem = MMAntSystem(tspData, numOfAnts=numOfAnts, 
+                                  numberOfAttempts=numAttempts, 
+                                  pheromoneDecay=0.98)
+    bestSolution = antSystem.bestSolution
+    bestDist = antSystem.bestDist
   else:
     logging.info(f"doing MCTS")
+    # Algorith Tuning
+    numOfAnts = tspData.dimension //2
+    if numOfAnts < 2:
+      numOfAnts = 2 
+    #numAttempts = tspData.dimension * tspData.dimension
+    numAttempts = int( tspData.dimension * math.log(tspData.dimension) )
+    #numAttempts = tspData.dimension
+    antSystem = MonteCarloAntColony(tspData, numOfAnts=numOfAnts, 
+                                  numberOfAttempts=numAttempts, 
+                                  pheromoneDecay=0.98)
+    bestSolution = antSystem.bestSolution
+    bestDist = antSystem.bestDist
 
+  logging.debug("pheromone\n" + tspData.pheromone_to_string())
+  logging.debug("cost\n" + tspData.cost_to_string())
+
+  return bestSolution, bestDist
+  
+if __name__ == "__main__":
+  inputargs = args()
+  bestSolution, bestDist = solveTSP(inputargs)
   print(f"Best Solution:")
   solutionString = "  "
   for i in range(len(bestSolution)):
@@ -99,7 +155,3 @@ def main(inputargs):
   if len(solutionString) > 2:
     print(solutionString)
   print(f"bestDist: {bestDist}")
-  
-if __name__ == "__main__":
-  inputargs = args()
-  main(inputargs)

@@ -34,6 +34,24 @@ class test_SymetricMatrix(unittest.TestCase):
     retValue = matrix.get_value(5,1)
     self.assertEqual(retValue, setValue)
 
+class test_SymetricMatrix(unittest.TestCase):
+  def test_SymetricMatrix(self):
+    # Validate Initialization
+    matrix = SymetricMatrix(12)
+
+    # Validate set value
+    setValue = 2.0
+    matrix.set_value(11,12, setValue)
+    retValue = matrix.get_value(11,12)
+    self.assertEqual(retValue, setValue)
+
+    # Validate node symetry
+    setValue = 82.0
+    matrix.set_value(6,11, setValue)
+    retValue = matrix.get_value(6,11)
+    self.assertEqual(retValue, setValue)
+    logging.debug(matrix.to_string())
+
 
 
 if __name__ == '__main__':
