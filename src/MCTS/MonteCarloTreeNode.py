@@ -132,7 +132,10 @@ class MCTSNode:
             logging.error("Invalid data sent to the Next Node method")
             return TypeError()
 
+        isRollout = True
+
         if currentFoodSourceId is None:
+            isRollout = False
             currentFoodSourceId = self.CurrentFoodSource.FoodSourceId
             
             # Mark the children of this Node already rolled out by the MCTS as visited
@@ -148,7 +151,7 @@ class MCTSNode:
         bestPheromoneFoodSourceId = None
         for bestPheromone in bestPheromoneTargets:
             foodSourceIdTarget = bestPheromone[0]
-            if foodSourceIdTarget not in visitedFoodSources:
+            if foodSourceIdTarget not in visitedFoodSources and (isRollout or foodSourceIdTarget in self.ChildNodes):
                 bestPheromoneFoodSource = self.Environment.FoodSourceDict[foodSourceIdTarget]
                 bestPheromoneFoodSourceId = foodSourceIdTarget
                 break
@@ -159,11 +162,13 @@ class MCTSNode:
         closestFoodSourceId = None
         for closestTrail in closestTargetTrailTuples:
             targetFoodSourceId = self.Environment.get_target_foodsourceId(currentFoodSourceId, closestTrail)
-            if targetFoodSourceId not in visitedFoodSources:
+            if targetFoodSourceId not in visitedFoodSources and (isRollout or targetFoodSourceId in self.ChildNodes):
                 closestFoodSource = self.Environment.FoodSourceDict[targetFoodSourceId]
                 closestFoodSourceId = targetFoodSourceId
                 break
 
+        # Determine whether to take the closest food source or the strongest
+        # pheromone trail
         if bestPheromoneFoodSource is not None and closestFoodSource is None:
             return bestPheromoneFoodSource
         elif closestFoodSource is not None and bestPheromoneFoodSource is None:
@@ -206,10 +211,34 @@ class MCTSNode:
     def populate_children(self):
         # Create Trails between the current Food Source
         # and all unvisited Food Sources
-        for foodSource in self.Environment.FoodSources:
-            if foodSource.FoodSourceId not in self.VisitedNodes and foodSource != self.CurrentFoodSource:
-                node = MCTSNode(self.Environment, self, foodSource, self.OngoingTour)
-                self.ChildNodes[foodSource.FoodSourceId] = node
+
+        bestPheromoneTrails = self.Environment.find_best_pheromone_trails(self.CurrentFoodSource.FoodSourceId)
+        closestTrails = self.Environment.find_closest_distances(self.CurrentFoodSource.FoodSourceId)
+
+        foodSourceIds = set()
+
+        pheromoneNodeCount = 0
+        for bestPheromoneTrail in bestPheromoneTrails:
+            if pheromoneNodeCount >= 25:
+                break
+            foodSourceId = bestPheromoneTrail[0]
+            if foodSourceId not in self.VisitedNodes:
+                foodSourceIds.add(foodSourceId)
+                pheromoneNodeCount += 1
+
+        closestNodeCount = 0
+        for closestTrail in closestTrails:
+            if closestNodeCount >= 25:
+                break
+            closestFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource.FoodSourceId, closestTrail)
+            if closestFoodSourceId not in self.VisitedNodes:
+                foodSourceIds.add(closestFoodSourceId)
+                closestNodeCount += 1
+
+        for foodSourceId in foodSourceIds:
+            foodSource = self.Environment.FoodSourceDict[foodSourceId]
+            node = MCTSNode(self.Environment, self, foodSource, self.OngoingTour)
+            self.ChildNodes[foodSource.FoodSourceId] = node
 
     def simulate(self):
         pass

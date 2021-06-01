@@ -97,7 +97,7 @@ class Environment:
                 pheromoneScore = self.PheromoneTrails[foodSourceId1][foodSourceId2]
 
                 if pheromoneScore > 0:
-                    pheromoneScoreTuple = (foodSourceId2, pheromoneScore)
+                    pheromoneScoreTuple = (foodSource2.FoodSourceId, pheromoneScore)
                     self.PheromoneTrailsBestLookup[foodSource1.FoodSourceId].append(pheromoneScoreTuple)
         logging.info("Generating dictionary of sorted pheromone trails End")
 
