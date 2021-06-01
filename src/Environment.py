@@ -132,6 +132,20 @@ class Environment:
 
         self.PheromoneTrails[pheromoneTrail[0]][pheromoneTrail[1]] = self.PheromoneTrails[pheromoneTrail[0]][pheromoneTrail[1]] + 1
 
+    def score_tour(self, tour):
+        totalLength = 0
+
+        if(len(tour) != len(self.FoodSources)):
+            logging.error('TOUR NOT COMPLETE')
+            logging.error(f'TOUR SIZE: {len(tour)}')
+
+        for i in range(len(tour) - 1):
+            totalLength += self.find_trail_distance(tour[i], tour[i + 1])
+
+        totalLength += self.find_trail_distance(tour[0], tour[len(tour) - 1])
+        
+        return totalLength
+
     # Since the Food Sources in the Trail Tuples are sorted by ID to make
     # A -> B and B -> A the same trail, we need this method to determine
     # which Food Source we are traveling to.

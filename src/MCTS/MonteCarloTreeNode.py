@@ -12,10 +12,13 @@ class MCTSNode:
         self.Parent = parent
 
         self.OngoingTour = list(ongoingTour)
-        self.OngoingTour.append(currentFoodSource.FoodSourceId)
 
         # Append the given food source to the tour.
         self.VisitedNodes = set(self.OngoingTour)
+
+        if currentFoodSource not in self.VisitedNodes:
+            self.OngoingTour.append(currentFoodSource.FoodSourceId)
+            self.VisitedNodes.add(currentFoodSource)
 
         self.CurrentFoodSource = currentFoodSource
         self.ChildNodes = dict()
@@ -70,7 +73,7 @@ class MCTSNode:
         rolloutPaths = self.find_rollout_candidates(self.CurrentFoodSource.FoodSourceId, visitedNodes)
 
         if len(rolloutPaths) == 0:
-            return self.score_tour(list(self.OngoingTour))
+            return self.Environment.score_tour(list(self.OngoingTour))
 
         pathRolloutScores = []
 
@@ -94,7 +97,7 @@ class MCTSNode:
 
                 nextFoodSource = self.find_foodsource_from_strongest_unvisited_pheromone_trail(currentFoodSource.FoodSourceId, rolloutVisitedNodes)
 
-            tourScore = self.score_tour(rolloutTour)
+            tourScore = self.Environment.score_tour(rolloutTour)
 
             pathRolloutScores.append(tourScore)
 
@@ -129,20 +132,6 @@ class MCTSNode:
             # Move one step up the tree
             currentNode = parent
             parent = currentNode.Parent
-    
-    def score_tour(self, tour):
-        totalLength = 0
-
-        if(len(tour) != len(self.Environment.FoodSources)):
-            logging.error('TOUR NOT COMPLETE')
-            logging.error(f'TOUR SIZE: {len(tour)}')
-
-        for i in range(len(tour) - 1):
-            totalLength += self.Environment.find_trail_distance(tour[i], tour[i + 1])
-
-        totalLength += self.Environment.find_trail_distance(tour[0], tour[len(tour) - 1])
-        
-        return totalLength
 
     def find_foodsource_from_strongest_unvisited_pheromone_trail(self, currentFoodSourceId, visitedFoodSources):
         return self.__find_best_pheromone_or_closest_foodsource(currentFoodSourceId, visitedFoodSources)
@@ -228,7 +217,7 @@ class MCTSNode:
         bestPheromoneTargets = self.Environment.find_best_pheromone_trails(currentFoodSourceId)
         pheromonePathCount = 0
         for bestPheromone in bestPheromoneTargets:
-            if pheromonePathCount >= 5:
+            if pheromonePathCount >= 3:
                 break
             foodSourceIdTarget = bestPheromone[0]
             if foodSourceIdTarget not in visitedFoodSources:
@@ -239,7 +228,7 @@ class MCTSNode:
         closestTargetTrailTuples = self.Environment.find_closest_distances(currentFoodSourceId)
         closestPathCount = 0
         for closestTrail in closestTargetTrailTuples:
-            if closestPathCount >= 5:
+            if closestPathCount >= 3:
                 break
             targetFoodSourceId = self.Environment.get_target_foodsourceId(currentFoodSourceId, closestTrail)
             if targetFoodSourceId not in visitedFoodSources:
@@ -276,7 +265,7 @@ class MCTSNode:
 
     def upper_confidence_bound(self):
         return (
-            ((self.AverageTourDistance + self.BestTourDistance) / 2)
+            self.BestTourDistance
             + 1.41 * math.sqrt(math.log(self.Parent.get_visit_count()) / self.VisitCount)
         )
 
@@ -291,7 +280,7 @@ class MCTSNode:
 
         pheromoneNodeCount = 0
         for bestPheromoneTrail in bestPheromoneTrails:
-            if pheromoneNodeCount >= 50:
+            if pheromoneNodeCount >= 25:
                 break
             foodSourceId = bestPheromoneTrail[0]
             if foodSourceId not in self.VisitedNodes:
@@ -300,7 +289,7 @@ class MCTSNode:
 
         closestNodeCount = 0
         for closestTrail in closestTrails:
-            if closestNodeCount >= 50:
+            if closestNodeCount >= 25:
                 break
             closestFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource.FoodSourceId, closestTrail)
             if closestFoodSourceId not in self.VisitedNodes:
