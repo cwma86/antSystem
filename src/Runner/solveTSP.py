@@ -4,6 +4,9 @@ import logging
 import math
 import os
 import sys
+import cv2 as cv
+import numpy as np
+import time
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 # Generic TSP support imports
@@ -140,15 +143,68 @@ def solveTSP(inputargs):
   logging.debug("pheromone\n" + tspData.pheromone_to_string())
   logging.debug("cost\n" + tspData.cost_to_string())
 
-  return bestSolution, bestDist
-  
+  return bestSolution, bestDist, tspData
+
+
+def createImage(bestSolution, bestDist, tspData):
+  #Find Bounds of nodes
+  minX, minY, = 999999999999999,999999999999999
+  maxX, maxY = 0, 0
+  for node in tspData.nodes:
+    if node.xCoord > maxX:
+      maxX = node.xCoord
+    if node.xCoord < minX:
+      minX = node.xCoord
+    if node.yCoord > maxY:
+      maxY = node.yCoord
+    if node.yCoord < minY:
+      minY = node.yCoord
+
+  #Image height and width
+  h = 1000
+  w = 1000
+  # Create padding on bounds
+  xPadding = (maxX - minX) * 0.05
+  yPadding = (maxY - minY) * 0.05
+  minX -= xPadding
+  maxX += xPadding
+  minY -= yPadding
+  maxY += yPadding
+
+  #Create white image
+  img = np.full((h, w, 3), 255, np.uint8)
+  #Draw nodes as circles
+  for node in tspData.nodes:
+    x = int(((node.xCoord - minX) / (maxX - minX)) * w)
+    y = int(((node.yCoord - minY) / (maxY - minY)) * h)
+    # print(x,y)
+    cv.circle(img,(x,y),6,(50,50,50), 3)
+
+  #Draw paths
+  prevNode = tspData.nodes[bestSolution[-1]-1]
+  for i in range(len(bestSolution)):
+    x = int(((tspData.nodes[bestSolution[i]-1].xCoord - minX) / (maxX - minX)) * w)
+    y = int(((tspData.nodes[bestSolution[i]-1].yCoord - minY) / (maxY - minY)) * h)
+    x1 = int(((prevNode.xCoord - minX) / (maxX - minX)) * w)
+    y1 = int(((prevNode.yCoord - minY) / (maxY - minY)) * h)
+    prevNode = tspData.nodes[bestSolution[i]-1]
+    cv.line(img, (x, y), (x1, y1), (150, 150, 150), 2, lineType=cv.LINE_4)
+
+  #Write image to disk
+  cv.imwrite("out.png",img)
+
+
 if __name__ == "__main__":
+  start = time.time()
   inputargs = args()
-  bestSolution, bestDist = solveTSP(inputargs)
+  bestSolution, bestDist, tspData = solveTSP(inputargs)
+  end = time.time()
+  print(f"Elapsed Time: {(end-start)*1000}")
+  createImage( bestSolution, bestDist, tspData)
   print(f"Best Solution:")
   solutionString = "  "
   for i in range(len(bestSolution)):
-    solutionString += (f"node[{i}]: {bestSolution[i]}, ")
+    solutionString += (f"node[{i}]: {bestSolution[i]-1}, ")
     if i % 5 == 4:
       print(solutionString)
       solutionString = "  "
