@@ -8,6 +8,8 @@ import cv2 as cv
 import numpy as np
 import time
 
+from TspGraph import TspGraph
+
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 # Generic TSP support imports
 support_dir = os.path.join(script_path, "..","Support")
@@ -50,6 +52,8 @@ def args():
                       help='Run Min-Max Ant Colony Optimization Algorithm')
   parser.add_argument('--Brute', action='store_true',
                       help='Run Brute Force Algorithm')
+  parser.add_argument('--MCTSAntColony', action='store_true',
+                      help='Run Monte Carlo Tree Search with Ant Colony')
   parser.add_argument('-a', '--workerAntCount', type=int, 
                       help='The amount of Worker Ants to crawl '
                         + 'the food sources and leave pheromone trails')
@@ -80,6 +84,11 @@ def args():
     args.AntSystem = False
     args.Brute = False
     args.MCTS = False
+  elif args.MCTSAntColony:
+    logging.info("Running Monte Carlo Tree Search Ant Colony Optimization algorithm")
+    args.AntSystem = False
+    args.Brute = False
+    args.MMAS = False
   else:
     logging.info("Running Monte Carlo Tree Search Ant Colony Optimization algorithm")
     args.AntSystem = False
@@ -125,6 +134,10 @@ def solveTSP(inputargs):
                                   pheromoneDecay=0.98)
     bestSolution = antSystem.bestSolution
     bestDist = antSystem.bestDist
+    logging.info(f'MMAS Best Solution: {bestSolution}')
+    logging.info(f'MMAS Distance: {bestDist}')
+  elif inputargs.MCTSAntColony:
+    tspGraph = TspGraph(filename=graphFile, workerAntCount=workerAntCount)
   else:
     logging.info(f"doing MCTS")
     # Algorith Tuning
