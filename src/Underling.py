@@ -30,7 +30,9 @@ class Underling:
         self.Tour = [self.CurrentFoodSource.FoodSourceId]
 
     def execute_mcts(self):
-        parent = MCTSNode(self.Environment, None, self.CurrentFoodSource)
+        root = MCTSNode(self.Environment, None, self.CurrentFoodSource)
+
+        parent = root
 
         logging.info('Root Node Initial Info')
         logging.info(f'Root Food Source ID: {parent.get_foodsource().FoodSourceId}')
@@ -39,14 +41,11 @@ class Underling:
         logging.info('')
 
         while len(self.VisitedFoodSources) < len(self.Environment.FoodSources):
-            resources = len(self.Environment.FoodSources) - len(self.Tour)
+            resources = 1000
             while resources > 0:
 
-                if(resources % 30 == 0):
+                if(resources % 3 == 0):
                     selectedNode = parent.select() #Expansion is included in this step
-
-                    if selectedNode is None:
-                        i = 1
 
                     logging.info('Selected Node Initial Info')
                     logging.info(f'Node Level {len(selectedNode.OngoingTour)}')
@@ -57,36 +56,34 @@ class Underling:
                     if selectedNode.IsTerminalNode:
                         break
 
-                    tourScore = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
+                    tourScore, tourPath = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
                     logging.info(f'Tour Score: {tourScore}')
                     logging.info('')
 
-                    selectedNode.propagate(tourScore)
+                    selectedNode.propagate(tourScore, tourPath)
                     logging.info('Root Node Info after Propagation')
-                    logging.info(f'Root Food Source ID: {parent.get_foodsource().FoodSourceId}')
-                    logging.info(f'Root AVG: {parent.AverageTourDistance}')
-                    logging.info(f'Root BEST: {parent.BestTourDistance}')
+                    logging.info(f'Root Food Source ID: {root.get_foodsource().FoodSourceId}')
+                    logging.info(f'Root AVG: {root.AverageTourDistance}')
+                    logging.info(f'Root BEST: {root.BestTourDistance}')
+                    logging.info(f'Root Best Rollout: {root.BestRollout}')
                     logging.info(f'Resources Remaining: {resources}')
                     logging.info('')
                 else:
                     selectedNode = parent.select() #Expansion is included in this step
 
-                    if selectedNode is None:
-                        i = 1
-
                     # Check if terminal node
                     if selectedNode.IsTerminalNode:
                         break
 
-                    tourScore = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
-                    selectedNode.propagate(tourScore)
+                    (tourScore, tourPath) = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
+                    selectedNode.propagate(tourScore, tourPath)
                 
                 resources -= 1
 
             logging.info('Root Node Info after MCTS')
-            logging.info(f'Root Food Source ID: {parent.get_foodsource().FoodSourceId}')
-            logging.info(f'Root AVG: {parent.AverageTourDistance}')
-            logging.info(f'Root BEST: {parent.BestTourDistance}')
+            logging.info(f'Root Food Source ID: {root.get_foodsource().FoodSourceId}')
+            logging.info(f'Root AVG: {root.AverageTourDistance}')
+            logging.info(f'Root BEST: {root.BestTourDistance}')
             logging.info('')
 
             bestChild = self.__find_best_child(parent)
@@ -102,9 +99,11 @@ class Underling:
 
         logging.info(f'Finished')
 
-        tour = [i for i in self.Tour]
-        logging.info(f'Tour: {tour}')
-        logging.info(f'Score: {self.Environment.score_tour(tour)}')
+        logging.info(f'Root Best Tour: {root.BestRollout}')
+        logging.info(f'Root Tour Score: {self.Environment.score_tour(root.BestRollout)}')
+
+        logging.info(f'Generated Tour: {self.Tour}')
+        logging.info(f'Generated Tour Score: {self.Environment.score_tour(self.Tour)}')
 
     def __find_best_child(self, parentNode):
         bestChild = None

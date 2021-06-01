@@ -29,8 +29,10 @@ class MCTSNode:
             parentFoodSourceId = parent.get_foodsource().FoodSourceId
             self.PheromoneScore = environment.get_pheromone_score(parentFoodSourceId, currentFoodSource.FoodSourceId)
 
-        self.AverageTourDistance = math.inf
+        self.AverageTourDistance = 0
         self.BestTourDistance = math.inf
+        self.BestRollout = None
+
         self.VisitCount = 0
         self.IsFullyExpanded = False
         self.IsTerminalNode = False
@@ -73,9 +75,11 @@ class MCTSNode:
         rolloutPaths = self.find_rollout_candidates(self.CurrentFoodSource.FoodSourceId, visitedNodes)
 
         if len(rolloutPaths) == 0:
-            return self.Environment.score_tour(list(self.OngoingTour))
+            return (self.Environment.score_tour(list(self.OngoingTour)), list(self.OngoingTour))
 
         pathRolloutScores = []
+        bestPathScore = math.inf
+        bestPath = None
 
         for pathFoodSource in rolloutPaths:
             # Navigate unvisited food sources along the trails with the strongest Pheromones
@@ -99,15 +103,20 @@ class MCTSNode:
 
             tourScore = self.Environment.score_tour(rolloutTour)
 
+            if tourScore < bestPathScore:
+                bestPathScore = tourScore
+                bestPath = rolloutTour
+
             pathRolloutScores.append(tourScore)
 
-        return max(pathRolloutScores)
+        return (bestPathScore, bestPath)
 
-    def propagate(self, rolloutScore):
+    def propagate(self, rolloutScore, rolloutPath):
         currentNode = self
 
         currentNode.BestTourDistance = rolloutScore
         currentNode.AverageTourDistance = rolloutScore
+        currentNode.BestRollout = rolloutPath
         currentNode.VisitCount = 1
 
         if(currentNode.Parent is not None):
@@ -118,6 +127,7 @@ class MCTSNode:
             # propagate the best tour distance to the parent
             if currentNode.BestTourDistance < parent.BestTourDistance:
                 parent.BestTourDistance = currentNode.BestTourDistance
+                parent.BestRollout = currentNode.BestRollout
 
             # Calculate the parent's new average tour distance
             summedChildScores = 0
@@ -217,7 +227,7 @@ class MCTSNode:
         bestPheromoneTargets = self.Environment.find_best_pheromone_trails(currentFoodSourceId)
         pheromonePathCount = 0
         for bestPheromone in bestPheromoneTargets:
-            if pheromonePathCount >= 3:
+            if pheromonePathCount >= 10:
                 break
             foodSourceIdTarget = bestPheromone[0]
             if foodSourceIdTarget not in visitedFoodSources:
@@ -228,7 +238,7 @@ class MCTSNode:
         closestTargetTrailTuples = self.Environment.find_closest_distances(currentFoodSourceId)
         closestPathCount = 0
         for closestTrail in closestTargetTrailTuples:
-            if closestPathCount >= 3:
+            if closestPathCount >= 10:
                 break
             targetFoodSourceId = self.Environment.get_target_foodsourceId(currentFoodSourceId, closestTrail)
             if targetFoodSourceId not in visitedFoodSources:
@@ -280,7 +290,7 @@ class MCTSNode:
 
         pheromoneNodeCount = 0
         for bestPheromoneTrail in bestPheromoneTrails:
-            if pheromoneNodeCount >= 25:
+            if pheromoneNodeCount >= 50:
                 break
             foodSourceId = bestPheromoneTrail[0]
             if foodSourceId not in self.VisitedNodes:
@@ -289,7 +299,7 @@ class MCTSNode:
 
         closestNodeCount = 0
         for closestTrail in closestTrails:
-            if closestNodeCount >= 25:
+            if closestNodeCount >= 50:
                 break
             closestFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource.FoodSourceId, closestTrail)
             if closestFoodSourceId not in self.VisitedNodes:
