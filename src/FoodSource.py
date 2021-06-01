@@ -1,10 +1,10 @@
 class FoodSource: 
     def __init__(self, foodSourceDataString):
         try:
-            foodData = [i.strip() for i in foodSourceDataString.split(' ')]
-            self.FoodSourceId = int(foodData[0])
-            self.XPos = float(foodData[1])
-            self.YPos = float(foodData[2])
+            foodData = [i.strip() for i in foodSourceDataString.split(' ') if i != '']
+            self.FoodSourceId = int(foodData[0].strip())
+            self.XPos = float(foodData[1].strip())
+            self.YPos = float(foodData[2].strip())
         except:
             print(foodSourceDataString)
 

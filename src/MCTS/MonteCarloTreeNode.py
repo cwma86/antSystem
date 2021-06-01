@@ -30,10 +30,15 @@ class MCTSNode:
         self.BestTourDistance = math.inf
         self.VisitCount = 0
         self.IsFullyExpanded = False
+        self.IsTerminalNode = False
 
     def select(self):
-        if len(self.ChildNodes) == 0:
+        if len(self.ChildNodes) == 0 and not self.IsTerminalNode:
             self.populate_children()
+            logging.info(f'Expanding child at depth {len(self.OngoingTour)}')
+
+        if self.IsTerminalNode:
+            return self
 
         if not self.IsFullyExpanded:
             unvisitedChild = self.pick_unvisited_child()
@@ -239,6 +244,10 @@ class MCTSNode:
             foodSource = self.Environment.FoodSourceDict[foodSourceId]
             node = MCTSNode(self.Environment, self, foodSource, self.OngoingTour)
             self.ChildNodes[foodSource.FoodSourceId] = node
+
+        if len(self.ChildNodes) == 0:
+            logging.info("Terminal Node Reached")
+            self.IsTerminalNode = True
 
     def simulate(self):
         pass

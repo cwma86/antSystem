@@ -99,6 +99,11 @@ class Underling:
                 logging.info('')
             else:
                 selectedNode = mcts.select() #Expansion is included in this step
+
+                # Check if terminal node
+                if selectedNode.IsTerminalNode:
+                    break
+
                 tourScore = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
                 selectedNode.propagate(tourScore)
             
