@@ -57,7 +57,7 @@ class MCTSNode:
         unvisitedChild = self.pick_unvisited_child()
 
         if unvisitedChild is None:
-            logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} has no more unvisited children. Marking as Fully Expanded')
+            logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} at level {len(self.OngoingTour)} has no more unvisited children. Marking as Fully Expanded')
             self.IsFullyExpanded = True
             return self
             
@@ -291,7 +291,7 @@ class MCTSNode:
 
         pheromoneNodeCount = 0
         for bestPheromoneTrail in bestPheromoneTrails:
-            if pheromoneNodeCount >= 25:
+            if pheromoneNodeCount >= 50:
                 break
             foodSourceId = bestPheromoneTrail[0]
             if foodSourceId not in self.VisitedNodes:
@@ -300,7 +300,7 @@ class MCTSNode:
 
         closestNodeCount = 0
         for closestTrail in closestTrails:
-            if closestNodeCount >= 25:
+            if closestNodeCount >= 50:
                 break
             closestFoodSourceId = self.Environment.get_target_foodsourceId(self.CurrentFoodSource.FoodSourceId, closestTrail)
             if closestFoodSourceId not in self.VisitedNodes:

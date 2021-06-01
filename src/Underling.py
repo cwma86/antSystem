@@ -30,6 +30,7 @@ class Underling:
             if(resources % 400 == 0):
                 selectedNode = mcts.select() #Expansion is included in this step
                 logging.info('Selected Node Initial Info')
+                logging.info(f'Node Level {len(selectedNode.OngoingTour)}')
                 logging.info(f'Selected Food Source ID: {selectedNode.get_foodsource().FoodSourceId}')
                 logging.info(f'Parent Food Source ID: {selectedNode.Parent.get_foodsource().FoodSourceId}')
                 logging.info('')
@@ -46,6 +47,7 @@ class Underling:
                 logging.info(f'Root Food Source ID: {mcts.get_foodsource().FoodSourceId}')
                 logging.info(f'Root AVG: {mcts.AverageTourDistance}')
                 logging.info(f'Root BEST: {mcts.BestTourDistance}')
+                logging.info(f'Resources Remaining: {resources}')
                 logging.info('')
             else:
                 selectedNode = mcts.select() #Expansion is included in this step
