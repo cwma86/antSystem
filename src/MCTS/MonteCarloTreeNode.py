@@ -29,7 +29,6 @@ class MCTSNode:
             parentFoodSourceId = parent.get_foodsource().FoodSourceId
             self.PheromoneScore = environment.get_pheromone_score(parentFoodSourceId, currentFoodSource.FoodSourceId)
 
-        self.AverageTourDistance = 0
         self.BestTourDistance = math.inf
         self.BestRollout = None
 
@@ -39,7 +38,6 @@ class MCTSNode:
 
     def select(self):
         if self.IsTerminalNode:
-            logging.info(f'Child {self.CurrentFoodSource.FoodSourceId} at level {len(self.OngoingTour)} is Terminal')
             return self
 
         if self.IsFullyExpanded:
@@ -54,7 +52,6 @@ class MCTSNode:
             self.populate_children()
 
             if len(self.ChildNodes) == 0:
-                logging.info("Terminal Node Reached")
                 self.IsTerminalNode = True
 
                 return self
@@ -62,7 +59,6 @@ class MCTSNode:
         unvisitedChild = self.pick_unvisited_child()
 
         if unvisitedChild is None:
-            logging.info(f'Node {self.CurrentFoodSource.FoodSourceId} at level {len(self.OngoingTour)} has no more unvisited children. Marking as Fully Expanded')
             self.IsFullyExpanded = True
             return self
             
@@ -115,7 +111,6 @@ class MCTSNode:
         currentNode = self
 
         currentNode.BestTourDistance = rolloutScore
-        currentNode.AverageTourDistance = rolloutScore
         currentNode.BestRollout = rolloutPath
         currentNode.VisitCount = 1
 
@@ -128,13 +123,6 @@ class MCTSNode:
             if currentNode.BestTourDistance < parent.BestTourDistance:
                 parent.BestTourDistance = currentNode.BestTourDistance
                 parent.BestRollout = currentNode.BestRollout
-
-            # Calculate the parent's new average tour distance
-            summedChildScores = 0
-            for childFoodSourceId in parent.ChildNodesVisited:
-                summedChildScores += parent.ChildNodes[childFoodSourceId].AverageTourDistance
-
-            parent.AverageTourDistance = summedChildScores / len(parent.ChildNodesVisited)
             
             # Increment the parent's visit count
             parent.VisitCount += 1
