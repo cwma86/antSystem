@@ -216,7 +216,7 @@ if __name__ == "__main__":
   inputargs = args()
   bestSolution, bestDist, tspData = solveTSP(inputargs)
   end = time.time()
-  print(f"Elapsed Time: {(end-start)*1000}")
+  print(f"Elapsed Time: {(end-start)*1000:0.2f} milliseconds")
   createImage( bestSolution, bestDist, tspData)
   print(f"Best Solution:")
   solutionString = "  "
@@ -227,4 +227,4 @@ if __name__ == "__main__":
       solutionString = "  "
   if len(solutionString) > 2:
     print(solutionString)
-  print(f"bestDist: {bestDist}")
+  print(f"bestDist: {bestDist:0.2f}")
