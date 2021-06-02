@@ -21,10 +21,10 @@ class Underling:
 
         parent = root
 
-        logging.info('Root Node Initial Info')
-        logging.info(f'Root Food Source ID: {parent.get_foodsource().FoodSourceId}')
-        logging.info(f'Root BEST: {parent.BestTourDistance}')
-        logging.info('')
+        logging.debug('Root Node Initial Info')
+        logging.debug(f'Root Food Source ID: {parent.get_foodsource().FoodSourceId}')
+        logging.debug(f'Root BEST: {parent.BestTourDistance}')
+        logging.debug('')
 
         resources = 0
         TARGET = 50000
@@ -33,25 +33,25 @@ class Underling:
             if(resources % 500 == 0):
                 selectedNode = parent.select() #Expansion is included in this step
 
-                logging.info('Selected Node Initial Info')
-                logging.info(f'Depth Level {len(selectedNode.OngoingTour)}')
-                logging.info(f'Selected Food Source ID: {selectedNode.get_foodsource().FoodSourceId}')
-                logging.info('')
+                logging.debug('Selected Node Initial Info')
+                logging.debug(f'Depth Level {len(selectedNode.OngoingTour)}')
+                logging.debug(f'Selected Food Source ID: {selectedNode.get_foodsource().FoodSourceId}')
+                logging.debug('')
 
                 if selectedNode.IsTerminalNode:
                     break
 
                 tourScore, tourPath = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
-                logging.info(f'Selected Node Tour Score: {tourScore}')
-                logging.info('')
+                logging.debug(f'Selected Node Tour Score: {tourScore}')
+                logging.debug('')
 
                 selectedNode.propagate(tourScore, tourPath)
-                logging.info('Root Node Info after Propagation')
-                logging.info(f'Root Food Source ID: {root.get_foodsource().FoodSourceId}')
-                logging.info(f'Root BEST: {root.BestTourDistance}')
-                logging.info(f'Root Best Rollout: {root.BestRollout}')
-                logging.info(f'Resources Remaining: {resources} of {TARGET}')
-                logging.info('')
+                logging.debug('Root Node Info after Propagation')
+                logging.debug(f'Root Food Source ID: {root.get_foodsource().FoodSourceId}')
+                logging.debug(f'Root BEST: {root.BestTourDistance}')
+                logging.debug(f'Root Best Rollout: {root.BestRollout}')
+                logging.debug(f'Resources Remaining: {resources} of {TARGET}')
+                logging.debug('')
             else:
                 selectedNode = parent.select() #Expansion is included in this step
 
@@ -67,13 +67,13 @@ class Underling:
                 bestChild = self.__find_best_child(parent)
                 if bestChild is None:
                     break
-                logging.info(f'Resources Used: {resources}')
-                logging.info(f'Stepping to the best child: {bestChild.CurrentFoodSource.FoodSourceId}')
+                logging.debug(f'Resources Used: {resources}')
+                logging.debug(f'Stepping to the best child: {bestChild.CurrentFoodSource.FoodSourceId}')
                 parent = bestChild
             
             resources += 1
 
-        logging.info(f'Finished')
+        logging.debug(f'Finished')
 
         bestTour = root.BestRollout
         bestScore = self.Environment.score_tour(root.BestRollout)

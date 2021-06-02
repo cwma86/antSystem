@@ -36,7 +36,7 @@ def args():
 
 
 
-def createImage(bestSolution,  tspData):
+def createImage(bestSolution,  tspData, outFile="out.png"):
   #Find Bounds of nodes
   minX, minY, = 999999999999999,999999999999999
   maxX, maxY = 0, 0
@@ -88,7 +88,7 @@ def createImage(bestSolution,  tspData):
 
   print("Total Distance :", totalDistance)
   #Write image to disk
-  cv.imwrite("out.png",img)
+  cv.imwrite(outFile,img)
 
 def bestSolution():
     #Ulysses 22

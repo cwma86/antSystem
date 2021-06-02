@@ -33,7 +33,7 @@ def brute_force_solution(tspData):
         minDist = dist
         minPath = distancePath 
       if counter % 10000 == 0:
-        logging.info(f"counter[{counter}]best solution distance {minDist}")
+        logging.debug(f"counter[{counter}]best solution distance {minDist}")
       counter +=1
   return minPath, minDist
 
