@@ -75,9 +75,12 @@ class Underling:
 
         logging.info(f'Finished')
 
-        logging.info(f'Root Best Tour: {root.BestRollout}')
-        logging.info(f'Root Tour Score: {self.Environment.score_tour(root.BestRollout)}')
+        bestTour = root.BestRollout
+        bestScore = self.Environment.score_tour(root.BestRollout)
+        logging.info(f'Root Best Tour: {bestTour}')
+        logging.info(f'Root Tour Score: {bestScore}')
         logging.info(f'MCTS Depth Analyzed: {len(selectedNode.OngoingTour)}')
+        return bestTour, bestScore
 
     def __find_best_child(self, parentNode):
         bestChild = None
