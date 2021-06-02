@@ -98,12 +98,14 @@ def algoCompare(inputargs):
     logOutput(bruteDt, bruteSolution, bruteDist, tspData, outFile)
 
 
-  numberOfRuns = 10
+  numberOfRuns = 20
   failCount = 0
   # Run Regular Ant System
   numOfAnts = tspData.dimension
   numAttempts = tspData.dimension * tspData.dimension
   dtSum = 0
+  minantDist = float("inf")
+  minantSolution = []
   if not inputargs.noBrute: #removing normal AS to save time
     for i in range(numberOfRuns):
       antstart = time.time()
@@ -118,12 +120,15 @@ def algoCompare(inputargs):
       if not inputargs.noBrute:
         if not np.isclose(antDist, bruteDist):
           failCount += 1
-    avgOptimal = (numAttempts-failCount)/numAttempts
-    avgRunTime = dtSum/numAttempts
+      if antDist < minantDist:
+          minantDist = antDist
+          minantSolution = antSolution
+    avgOptimal = (numberOfRuns-failCount)/numberOfRuns
+    avgRunTime = dtSum/numberOfRuns
     name="AS"
     print(f"{name} avgOptimal solution: {avgOptimal*100}%")
     print(f"{name} avgRunTime: {avgRunTime}")
-    logOutput(antDt, antSolution, antDist, tspData, name)
+    logOutput(avgRunTime, minantSolution, minantDist, tspData, name)
 
   # Run Min-Max Antsystem
   numOfAnts = tspData.dimension
@@ -132,6 +137,7 @@ def algoCompare(inputargs):
   dtSum = 0
   MMASDist = 0
   minMMASDist = float("inf")
+  minMMASSolution = []
   for i in range(numberOfRuns):
     MMASstart = time.time()
     antSystem = MMAntSystem(tspData, numOfAnts=numOfAnts, 
@@ -145,21 +151,23 @@ def algoCompare(inputargs):
     if not inputargs.noBrute:
       if not np.isclose(MMASDist, bruteDist):
         failCount += 1
-    else:
-      if MMASDist < minMMASDist:
-         minMMASDist = MMASDist
-  avgOptimal = (numAttempts-failCount)/numAttempts
-  avgRunTime = dtSum/numAttempts
+    if MMASDist < minMMASDist:
+        minMMASDist = MMASDist
+        minMMASSolution = MMASSolution
+  avgOptimal = (numberOfRuns-failCount)/numberOfRuns
+  avgRunTime = dtSum/numberOfRuns
   name="MMAS"
   print(f"{name} avgOptimal solution: {avgOptimal*100}%")
   print(f"{name} avgRunTime: {avgRunTime}")
-  logOutput(MMASDt, MMASSolution, MMASDist, tspData, name)
+  logOutput(avgRunTime, minMMASSolution, minMMASDist, tspData, name)
 
   # Run MCTS
   failCount = 0
   dtSum = 0
   MCTSDist = 0
   tollerance = 1.0
+  minMCTSDist = float("inf")
+  minMCTSSolution = []
   for i in range(numberOfRuns):
     workerAntCount = 20 # default number of ants
     MCTSstart = time.time()
@@ -182,12 +190,15 @@ def algoCompare(inputargs):
       # Consider the lowest solution for MMAS as optimal and compare
       if MCTSDist > (minMMASDist + tollerance):
         failCount += 1
-  avgOptimal = (numAttempts-failCount)/numAttempts
-  avgRunTime = dtSum/numAttempts
+    if MCTSDist < minMCTSDist:
+        minMCTSDist = MCTSDist
+        minMCTSSolution = MCTSSolution
+  avgOptimal = (numberOfRuns-failCount)/numberOfRuns
+  avgRunTime = dtSum/numberOfRuns
   name="MCTS"
   print(f"{name} avgOptimal solution: {avgOptimal*100}%")
   print(f"{name} avgRunTime: {avgRunTime}")
-  logOutput(MCTSDt, MCTSSolution, MCTSDist, tspData, name)
+  logOutput(avgRunTime, minMCTSSolution, minMCTSDist, tspData, name)
 
 
 if __name__ == "__main__":
