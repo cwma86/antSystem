@@ -5,7 +5,8 @@ ant system code for our CS510 project
 
 ## Installation
 
-Install python 3.x
+[Install python 3.x](https://wiki.python.org/moin/BeginnersGuide/Download)
+[install opencv-python](https://pypi.org/project/opencv-python/)
 clone this repo
 
 ## Usage
