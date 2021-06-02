@@ -104,30 +104,30 @@ def algoCompare(inputargs):
   numOfAnts = tspData.dimension
   numAttempts = tspData.dimension * tspData.dimension
   dtSum = 0
-  for i in range(numberOfRuns):
-    antstart = time.time()
-    antSystem = AntSystem(tspData, numOfAnts=numOfAnts, 
-                                  numberOfAttempts=numAttempts, 
-                                  pheromoneDecay=0.99)
-    antSolution = antSystem.bestSolution
-    antDist = antSystem.bestDist
-    antend = time.time()
-    antDt = (antend-antstart)*1000 # Milli Sec
-    dtSum += antDt
-    if not inputargs.noBrute:
-      if not np.isclose(antDist, bruteDist):
-        failCount += 1
-  avgOptimal = (numAttempts-failCount)/numAttempts
-  avgRunTime = dtSum/numAttempts
-  name="AS"
-  print(f"{name} avgOptimal solution: {avgOptimal*100}%")
-  print(f"{name} avgRunTime: {avgRunTime}")
-  logOutput(antDt, antSolution, antDist, tspData, name)
+  if not inputargs.noBrute: #removing normal AS to save time
+    for i in range(numberOfRuns):
+      antstart = time.time()
+      antSystem = AntSystem(tspData, numOfAnts=numOfAnts, 
+                                    numberOfAttempts=numAttempts, 
+                                    pheromoneDecay=0.99)
+      antSolution = antSystem.bestSolution
+      antDist = antSystem.bestDist
+      antend = time.time()
+      antDt = (antend-antstart)*1000 # Milli Sec
+      dtSum += antDt
+      if not inputargs.noBrute:
+        if not np.isclose(antDist, bruteDist):
+          failCount += 1
+    avgOptimal = (numAttempts-failCount)/numAttempts
+    avgRunTime = dtSum/numAttempts
+    name="AS"
+    print(f"{name} avgOptimal solution: {avgOptimal*100}%")
+    print(f"{name} avgRunTime: {avgRunTime}")
+    logOutput(antDt, antSolution, antDist, tspData, name)
 
   # Run Min-Max Antsystem
   numOfAnts = tspData.dimension
   numAttempts = int( tspData.dimension * math.log(tspData.dimension) )
-  MMASSolution = antSystem.bestSolution
   failCount = 0
   dtSum = 0
   MMASDist = 0
