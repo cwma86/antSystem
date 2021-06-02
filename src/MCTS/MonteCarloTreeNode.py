@@ -245,7 +245,7 @@ class MCTSNode:
 
         candidates.sort(key=lambda t: max(t[2],t[3]))
 
-        return [i[1] for i in candidates][0:5]
+        return [i[1] for i in candidates][0:10]
 
     def fully_expanded(self):
         return len([i for i in self.ChildNodes.values() if i.get_visit_count() == 0])
@@ -263,8 +263,8 @@ class MCTSNode:
 
     def upper_confidence_bound(self):
         return (
-            self.BestTourDistance
-            + 1.41 * math.sqrt(math.log(self.Parent.get_visit_count()) / self.VisitCount)
+            self.BestTourDistance / len(self.Environment.FoodSources)
+            + self.Environment.DistanceAverage / 4 * math.sqrt(math.log(self.Parent.get_visit_count()) / self.VisitCount)
         )
 
     def populate_children(self):

@@ -26,10 +26,11 @@ class Underling:
         logging.info(f'Root BEST: {parent.BestTourDistance}')
         logging.info('')
 
-        resources = 1000
-        while resources > 0:
+        resources = 0
+        TARGET = 50000
+        while resources < TARGET:
 
-            if(resources % 200 == 0):
+            if(resources % 500 == 0):
                 selectedNode = parent.select() #Expansion is included in this step
 
                 logging.info('Selected Node Initial Info')
@@ -49,7 +50,7 @@ class Underling:
                 logging.info(f'Root Food Source ID: {root.get_foodsource().FoodSourceId}')
                 logging.info(f'Root BEST: {root.BestTourDistance}')
                 logging.info(f'Root Best Rollout: {root.BestRollout}')
-                logging.info(f'Resources Remaining: {resources}')
+                logging.info(f'Resources Remaining: {resources} of {TARGET}')
                 logging.info('')
             else:
                 selectedNode = parent.select() #Expansion is included in this step
@@ -60,11 +61,30 @@ class Underling:
 
                 (tourScore, tourPath) = selectedNode.rollout() # 'Simulate' is an equivalent term you'll see in MCTS articles
                 selectedNode.propagate(tourScore, tourPath)
+
+            # Step down to the best child after a sufficient amount of expansion.
+            if (resources + 1) % (len(self.Environment.FoodSources) * 5) == 0:
+                bestChild = self.__find_best_child(parent)
+                if bestChild is None:
+                    break
+                logging.info(f'Resources Used: {resources}')
+                logging.info(f'Stepping to the best child: {bestChild.CurrentFoodSource.FoodSourceId}')
+                parent = bestChild
             
-            resources -= 1
+            resources += 1
 
         logging.info(f'Finished')
 
         logging.info(f'Root Best Tour: {root.BestRollout}')
         logging.info(f'Root Tour Score: {self.Environment.score_tour(root.BestRollout)}')
         logging.info(f'MCTS Depth Analyzed: {len(selectedNode.OngoingTour)}')
+
+    def __find_best_child(self, parentNode):
+        bestChild = None
+        bestChildScore = math.inf
+        for child in parentNode.ChildNodes.values():
+            if child.BestTourDistance < bestChildScore:
+                bestChild = child
+                bestChildScore = child.BestTourDistance
+
+        return bestChild
