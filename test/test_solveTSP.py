@@ -42,7 +42,7 @@ class test_solveTSP(unittest.TestCase):
     numberOfRuns = 1
     now = datetime.datetime.now()
     for i in range(numberOfRuns):
-      bestSolution, bestDist = solveTSP(args)
+      bestSolution, bestDist, tspData = solveTSP(args)
       if not math.isclose(bestDist, 638.108, abs_tol=0.001):
         failCount +=1
         logging.info(f"Incorrect path bestDist: {bestDist}")
@@ -63,7 +63,7 @@ class test_solveTSP(unittest.TestCase):
     numberOfRuns = 30
     initTime = datetime.datetime.now()
     for i in range(numberOfRuns):
-      bestSolution, bestDist = solveTSP(args)
+      bestSolution, bestDist, tspData = solveTSP(args)
       if not math.isclose(bestDist, 2825.271, abs_tol=0.001):
         failCount +=1
         logging.info(f"Incorrect path bestDist: {bestDist}")
@@ -87,7 +87,7 @@ class test_solveTSP(unittest.TestCase):
     numberOfRuns = 30
     initTime = datetime.datetime.now()
     for i in range(numberOfRuns):
-      bestSolution, bestDist = solveTSP(args)
+      bestSolution, bestDist, tspData = solveTSP(args)
       if not math.isclose(bestDist, 2825.271, abs_tol=0.001):
         failCount +=1
         logging.info(f"Incorrect path bestDist: {bestDist}")

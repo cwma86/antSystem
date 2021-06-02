@@ -8,7 +8,6 @@ import cv2 as cv
 import numpy as np
 import time
 
-from TspGraph import TspGraph
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
 # Generic TSP support imports
@@ -36,6 +35,11 @@ from MonteCarloAntColony import MonteCarloAntColony
 Brute_dir = os.path.join(script_path, "..","BruteForce")
 sys.path.insert(1, Brute_dir)
 from BruteForce import brute_force_solution
+
+# Brute Force imports
+Brute_dir = os.path.join(script_path, "..")
+sys.path.insert(1, Brute_dir)
+from TspGraph import TspGraph
 
 def args():
   defaultFilePath = os.path.join(script_path, '..', '..', 'TSPData','pcb10_test.tsp')
