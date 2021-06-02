@@ -47,6 +47,8 @@ def args():
   parser = argparse.ArgumentParser(description='Run Ant System')   
   parser.add_argument('--filename', default=defaultFilePath, type=str,
                       help='file path of tsp data')
+  parser.add_argument('--noBrute', action='store_true',
+                      help='Do not use brute force or calculate ')
   parser.add_argument('-v', '--verbose', action='store_true',
                       help='verbose logging')
   args = parser.parse_args()
@@ -85,14 +87,15 @@ def algoCompare(inputargs):
   logging.debug(tspData.data_to_string())
 
   # Run Brute Force
-  bruteSolution = []
   bruteDist = 0
-  brutestart = time.time()
-  bruteSolution, bruteDist = brute_force_solution(tspData)  
-  bruteend = time.time()
-  bruteDt = (bruteend-brutestart)*1000 # Millisec
-  outFile="brute"
-  logOutput(bruteDt, bruteSolution, bruteDist, tspData, outFile)
+  bruteSolution = []
+  if not inputargs.noBrute:
+    brutestart = time.time()
+    bruteSolution, bruteDist = brute_force_solution(tspData)  
+    bruteend = time.time()
+    bruteDt = (bruteend-brutestart)*1000 # Millisec
+    outFile="brute"
+    logOutput(bruteDt, bruteSolution, bruteDist, tspData, outFile)
 
 
   numberOfRuns = 10
@@ -111,8 +114,9 @@ def algoCompare(inputargs):
     antend = time.time()
     antDt = (antend-antstart)*1000 # Milli Sec
     dtSum += antDt
-    if not np.isclose(antDist, bruteDist):
-      failCount += 1
+    if not inputargs.noBrute:
+      if not np.isclose(antDist, bruteDist):
+        failCount += 1
   avgOptimal = (numAttempts-failCount)/numAttempts
   avgRunTime = dtSum/numAttempts
   name="AS"
@@ -126,6 +130,8 @@ def algoCompare(inputargs):
   MMASSolution = antSystem.bestSolution
   failCount = 0
   dtSum = 0
+  MMASDist = 0
+  minMMASDist = float("inf")
   for i in range(numberOfRuns):
     MMASstart = time.time()
     antSystem = MMAntSystem(tspData, numOfAnts=numOfAnts, 
@@ -136,35 +142,52 @@ def algoCompare(inputargs):
     MMASend = time.time()
     MMASDt = (MMASend-MMASstart)*1000
     dtSum += MMASDt
-    if not np.isclose(MMASDist, bruteDist):
-      failCount += 1
+    if not inputargs.noBrute:
+      if not np.isclose(MMASDist, bruteDist):
+        failCount += 1
+    else:
+      if MMASDist < minMMASDist:
+         minMMASDist = MMASDist
   avgOptimal = (numAttempts-failCount)/numAttempts
   avgRunTime = dtSum/numAttempts
   name="MMAS"
   print(f"{name} avgOptimal solution: {avgOptimal*100}%")
   print(f"{name} avgRunTime: {avgRunTime}")
-  logOutput(MMASDt, MMASSolution, MMASDist, tspData, outFile)
+  logOutput(MMASDt, MMASSolution, MMASDist, tspData, name)
 
   # Run MCTS
   failCount = 0
   dtSum = 0
+  MCTSDist = 0
+  tollerance = 1.0
   for i in range(numberOfRuns):
     workerAntCount = 20 # default number of ants
     MCTSstart = time.time()
     tspGraph = TspGraph(filename=inputargs.filename, workerAntCount=workerAntCount)
+
+    # Store Solution
     MCTSSolution = tspGraph.bestTour
     MCTSDist = tspGraph.bestScore
+
+    # Calc Time delta
     MCTSend = time.time()
     MCTSDt = (MCTSend-MCTSstart)*1000
     dtSum += MCTSDt
-    if not np.isclose(MMASDist, bruteDist):
-      failCount += 1
+
+    # Determine if solution is optimal
+    if not inputargs.noBrute:
+      if not np.isclose(MMASDist, bruteDist):
+        failCount += 1
+    else:
+      # Consider the lowest solution for MMAS as optimal and compare
+      if MCTSDist > (minMMASDist + tollerance):
+        failCount += 1
   avgOptimal = (numAttempts-failCount)/numAttempts
   avgRunTime = dtSum/numAttempts
   name="MCTS"
   print(f"{name} avgOptimal solution: {avgOptimal*100}%")
   print(f"{name} avgRunTime: {avgRunTime}")
-  logOutput(MCTSDt, MCTSSolution, MCTSDist, tspData, outFile)
+  logOutput(MCTSDt, MCTSSolution, MCTSDist, tspData, name)
 
 
 if __name__ == "__main__":
