@@ -58,7 +58,7 @@ def args():
                       help='Run Brute Force Algorithm')
   parser.add_argument('--MCTSAntColony', action='store_true',
                       help='Run Monte Carlo Tree Search with Ant Colony')
-  parser.add_argument('-a', '--workerAntCount', type=int, 
+  parser.add_argument('-a', '--workerAntCount', type=int, default=0,
                       help='The amount of Worker Ants to crawl '
                         + 'the food sources and leave pheromone trails')
   args = parser.parse_args()
@@ -113,12 +113,10 @@ def solveTSP(inputargs):
     bestSolution, bestDist = brute_force_solution(tspData)  
   elif inputargs.AntSystem:
     # Algorith Tuning
-    numOfAnts = tspData.dimension
-    if numOfAnts < 2:
-      numOfAnts = 2 
+    numOfAnts = inputargs.workerAntCount
+    if inputargs.workerAntCount == 0:
+      numOfAnts = tspData.dimension
     numAttempts = tspData.dimension * tspData.dimension
-    #numAttempts = int(tspData.dimension * 5 * math.log(tspData.dimension) // 1)
-    #numAttempts = tspData.dimension
     antSystem = AntSystem(tspData, numOfAnts=numOfAnts, 
                                   numberOfAttempts=numAttempts, 
                                   pheromoneDecay=0.99)
@@ -127,12 +125,11 @@ def solveTSP(inputargs):
 
   elif inputargs.MMAS:
     # Algorith Tuning
-    numOfAnts = tspData.dimension
-    if numOfAnts < 2:
-      numOfAnts = 2 
-    #numAttempts = tspData.dimension * tspData.dimension
+    numOfAnts = inputargs.workerAntCount
+    if inputargs.workerAntCount == 0:
+      numOfAnts = tspData.dimension
+
     numAttempts = int( tspData.dimension * math.log(tspData.dimension) )
-    #numAttempts = tspData.dimension
     antSystem = MMAntSystem(tspData, numOfAnts=numOfAnts, 
                                   numberOfAttempts=numAttempts, 
                                   pheromoneDecay=0.98)
@@ -141,7 +138,9 @@ def solveTSP(inputargs):
     logging.info(f'MMAS Best Solution: {bestSolution}')
     logging.info(f'MMAS Distance: {bestDist}')
   elif inputargs.MCTSAntColony:
-    workerAntCount = 20
+    workerAntCount = inputargs.workerAntCount
+    if inputargs.workerAntCount == 0:
+      workerAntCount = 20 # default number of ants
     tspGraph = TspGraph(filename=inputargs.filename, workerAntCount=workerAntCount)
     bestSolution = tspGraph.bestTour
     bestDist = tspGraph.bestScore
@@ -150,12 +149,10 @@ def solveTSP(inputargs):
   else:
     logging.info(f"doing MCTS")
     # Algorith Tuning
-    numOfAnts = tspData.dimension //2
-    if numOfAnts < 2:
-      numOfAnts = 2 
-    #numAttempts = tspData.dimension * tspData.dimension
+    numOfAnts = inputargs.workerAntCount
+    if inputargs.workerAntCount == 0:
+      numOfAnts = tspData.dimension // 2
     numAttempts = int( tspData.dimension * math.log(tspData.dimension) )
-    #numAttempts = tspData.dimension
     antSystem = MonteCarloAntColony(tspData, numOfAnts=numOfAnts, 
                                   numberOfAttempts=numAttempts, 
                                   pheromoneDecay=0.98)
