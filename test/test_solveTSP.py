@@ -24,6 +24,7 @@ dataPath = os.path.join(script_path, '..', 'TSPData')
 class Arg:
   def __init__(self):
     self.filename = ""
+    self.workerAntCount = 0
     self.Brute = False
     self.AntSystem = True
     self.MCTS = False
