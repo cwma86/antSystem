@@ -49,7 +49,7 @@ class TspGraph:
         environment.explore()
 
         underling = Underling(environment)
-        underling.execute_mcts()
+        self.bestTour, self.bestScore = underling.execute_mcts()
 
         # Write the vertices to log file
         if logging.root.level  >= logging.DEBUG:

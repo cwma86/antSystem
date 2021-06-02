@@ -141,7 +141,12 @@ def solveTSP(inputargs):
     logging.info(f'MMAS Best Solution: {bestSolution}')
     logging.info(f'MMAS Distance: {bestDist}')
   elif inputargs.MCTSAntColony:
-    tspGraph = TspGraph(filename=graphFile, workerAntCount=workerAntCount)
+    workerAntCount = 20
+    tspGraph = TspGraph(filename=inputargs.filename, workerAntCount=workerAntCount)
+    bestSolution = tspGraph.bestTour
+    bestDist = tspGraph.bestScore
+    logging.info(f'MCTSAntColony Best Solution: {bestSolution}')
+    logging.info(f'MCTSAntColony Distance: {bestDist}')
   else:
     logging.info(f"doing MCTS")
     # Algorith Tuning
@@ -165,8 +170,8 @@ def solveTSP(inputargs):
 
 def createImage(bestSolution, bestDist, tspData):
   #Find Bounds of nodes
-  minX, minY, = 999999999999999,999999999999999
-  maxX, maxY = 0, 0
+  minX, minY, = float("inf"), float("inf")
+  maxX, maxY = 0.0, 0.0
   for node in tspData.nodes:
     if node.xCoord > maxX:
       maxX = node.xCoord

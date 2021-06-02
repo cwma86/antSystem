@@ -11,43 +11,28 @@ clone this repo
 
 ## Usage
 
-for the help menu
+
+### MCTS Ant Colony optimization
 
 ```bash
-./src/antSystem.py -h
+./src/Runner/solveTsp.py --filename TSPData/pcb10_test.tsp --MCTSAntColony
 ```
 
-for processing the default file 'TSPData/pcb1173.tsp'
-```bash
-./src/antSystem.py
-```
-
-for providing a different data file 
-```bash
-./src/antSystem.py --filename <path to file>
-```
-
-## MCTS Ant Colony optimization
-
-```bash
-./src/Runner/solveTsp.py --filename TSPData/pcb10_test.tsp  --MCTS
-```
-
-## Min-Max Ant Colony optimization
+### Min-Max Ant Colony optimization
 This Algorithm was developed as a comparision mechanism for our MCTS ant colony optimization problem
 
 Warning: due to run time complexity, This algorithmn should be limited to solving TSP data sets of about 50 nodes
 ```bash
 ./src/Runner/solveTsp.py --filename TSPData/pcb10_test.tsp  --MMAS
 ```
-## Ant Colony optimization
+### Ant Colony optimization
 This Algorithm was developed as a comparision mechanism for our MCTS ant colony optimization problem
 
 Warning: due to run time complexity, This algorithmn should be limited to solving TSP data sets of about 50 nodes
 ```bash
 ./src/Runner/solveTsp.py --filename TSPData/pcb10_test.tsp  --AntSystem
 ```
-## Brute force solution
+### Brute force solution
 A Brute force solution was created to prove optimal solutions and as a comparision agianst AntSystem and MCTSACO
 
 Warning: This solution is both memory and computationally intensive, I would not reccomend running on a TSP data set over 5 nodes.
