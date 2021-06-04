@@ -65,7 +65,8 @@ Warning: This solution is both memory and computationally intensive, I would not
  ./src/Runner/algoCompare.py --filename TSPData/pcb10_test.tsp --noBrute
  ```
 ## Unit Testing
-This code is ran with every commit in our (CI/CD pipeline)[https://github.com/cwma86/antSystem/actions] 
+This code is ran with every commit in our [CI/CD pipeline](https://github.com/cwma86/antSystem/actions) 
+
 To run project unit test run 
 ```bash
 make check
