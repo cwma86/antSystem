@@ -1,16 +1,25 @@
-# antSystem
+# AntSystem
 
-ant system code for our CS510 project
-
+This project investigated solving the traveling salesman problem (TSP) using a Monte Carlo Tree search. 
+Prior research was found to be done solving these problems Through Brute force, Ant Colony optimization, and Min-max Ant Colony optimization. 
+For reference algorithms have been implemented to solve TSP's for all through of these methods, in addition too our new algorithmn, Monte 
+Carlo Tree Search Ant Colony Optimization.
 
 ## Installation
 
+### Install the necissary dependancies
 [Install python 3.x](https://wiki.python.org/moin/BeginnersGuide/Download)
 [install opencv-python](https://pypi.org/project/opencv-python/)
+
+### Get the code
 clone this repo
 
 ## Usage
-
+This repositiory contains implementations to solve TSP's based on the following methods
+* Brute Force
+* Ant Colony Optimization
+* Min-Max Ant Colony Optimization
+* Monte Carlo Tree Search Ant Colony Optimization
 
 ### MCTS Ant Colony optimization
 
