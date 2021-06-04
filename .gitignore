@@ -131,4 +131,5 @@ dmypy.json
 # project Specific ignore
 .vscode/
 foodSources.txt
+result_algoCompare.txt
 *.png

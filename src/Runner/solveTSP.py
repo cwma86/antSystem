@@ -26,7 +26,7 @@ AntSystem_dir = os.path.join(script_path, "..","MMAntSystem")
 sys.path.insert(1, AntSystem_dir)
 from MMAntSystem import MMAntSystem
 
-# MSTS AntSystem imports
+# MCTS AntSystem imports (depricated and replaced by  MCTS Ant system )
 MCTS_dir = os.path.join(script_path, "..","MCTS")
 sys.path.insert(1, MCTS_dir)
 from MonteCarloAntColony import MonteCarloAntColony
@@ -36,7 +36,7 @@ Brute_dir = os.path.join(script_path, "..","BruteForce")
 sys.path.insert(1, Brute_dir)
 from BruteForce import brute_force_solution
 
-# Brute Force imports
+# MCTS Ant system
 Brute_dir = os.path.join(script_path, "..")
 sys.path.insert(1, Brute_dir)
 from TspGraph import TspGraph
@@ -48,15 +48,15 @@ def args():
                       help='file path of tsp data')
   parser.add_argument('-v', '--verbose', action='store_true',
                       help='verbose logging')
-  parser.add_argument('--MCTS', action='store_true', default=True,
-                      help='Run Monte Carlo Tree Search Algorithm (default)')
+  parser.add_argument('--MCTS', action='store_true',
+                      help='Run Monte Carlo Tree Search Algorithm (depricated)')
   parser.add_argument('--AntSystem', action='store_true',
                       help='Run Ant Colony Optimization Algorithm')
   parser.add_argument('--MMAS', action='store_true',
                       help='Run Min-Max Ant Colony Optimization Algorithm')
   parser.add_argument('--Brute', action='store_true',
                       help='Run Brute Force Algorithm')
-  parser.add_argument('--MCTSAntColony', action='store_true',
+  parser.add_argument('--MCTSAntColony', action='store_true', default=True,
                       help='Run Monte Carlo Tree Search with Ant Colony')
   parser.add_argument('-a', '--workerAntCount', type=int, default=0,
                       help='The amount of Worker Ants to crawl '
@@ -78,18 +78,22 @@ def args():
     args.AntSystem = False
     args.MCTS = False
     args.MMAS = False
+    args.MCTSAntColony = False
   elif args.AntSystem:
     logging.info("Running Ant Colony Optimization algorithm")
     args.Brute = False
     args.MCTS = False
     args.MMAS = False
+    args.MCTSAntColony = False
   elif args.MMAS:
     logging.info("Running Min-Max Ant Colony Optimization algorithm")
     args.AntSystem = False
     args.Brute = False
     args.MCTS = False
+    args.MCTSAntColony = False
   elif args.MCTSAntColony:
     logging.info("Running Monte Carlo Tree Search Ant Colony Optimization algorithm")
+    args.MCTS = False
     args.AntSystem = False
     args.Brute = False
     args.MMAS = False
@@ -147,7 +151,7 @@ def solveTSP(inputargs):
     logging.info(f'MCTSAntColony Best Solution: {bestSolution}')
     logging.info(f'MCTSAntColony Distance: {bestDist}')
   else:
-    logging.info(f"doing MCTS")
+    logging.info(f"doing MCTS (depricated: please use MCTSAntColony)")
     # Algorith Tuning
     numOfAnts = inputargs.workerAntCount
     if inputargs.workerAntCount == 0:
