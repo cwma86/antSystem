@@ -46,9 +46,9 @@ class test_solveTSP(unittest.TestCase):
       bestSolution, bestDist, tspData = solveTSP(args)
       if not math.isclose(bestDist, 638.108, abs_tol=0.001):
         failCount +=1
-        logging.info(f"Incorrect path bestDist: {bestDist}")
+        logging.info(f"Incorrect path bestDist: {bestDist:.2f}")
     avgCorrect = (numberOfRuns-failCount)/numberOfRuns*100
-    print(f"average correct solution {avgCorrect}%")
+    print(f"average correct solution {avgCorrect:.2f}%")
     self.assertAlmostEqual(avgCorrect, 100.0)
 
 
@@ -67,13 +67,13 @@ class test_solveTSP(unittest.TestCase):
       bestSolution, bestDist, tspData = solveTSP(args)
       if not math.isclose(bestDist, 2825.271, abs_tol=0.001):
         failCount +=1
-        logging.info(f"Incorrect path bestDist: {bestDist}")
+        logging.info(f"Incorrect path bestDist: {bestDist:.2f}")
     finalTime = datetime.datetime.now()
     timeDelta = finalTime - initTime
     avgRunTime = timeDelta / numberOfRuns
     avgCorrect = (numberOfRuns-failCount)/numberOfRuns*100
-    logging.info(f"average AS time per run {avgRunTime}seconds")
-    logging.info(f"average AS correct solution {avgCorrect}%")
+    logging.info(f"average AS time per run {avgRunTime.total_seconds():.3f} seconds")
+    logging.info(f"average AS correct solution {avgCorrect:.2f}%")
     self.assertGreaterEqual(avgCorrect, 70)
 
   def test_solveTSPMMAnt(self):
@@ -91,13 +91,13 @@ class test_solveTSP(unittest.TestCase):
       bestSolution, bestDist, tspData = solveTSP(args)
       if not math.isclose(bestDist, 2825.271, abs_tol=0.001):
         failCount +=1
-        logging.info(f"Incorrect path bestDist: {bestDist}")
+        logging.info(f"Incorrect path bestDist: {bestDist:.2f}")
     finalTime = datetime.datetime.now()
     timeDelta = finalTime - initTime
     avgRunTime = timeDelta/ numberOfRuns
     avgCorrect = (numberOfRuns-failCount)/numberOfRuns*100
-    logging.info(f"average MMAS time per run {avgRunTime}seconds")
-    logging.info(f"average MMAS correct solution {avgCorrect}%")
+    logging.info(f"average MMAS time per run {avgRunTime.total_seconds():.3f} seconds")
+    logging.info(f"average MMAS correct solution {avgCorrect:.2f}%")
     self.assertGreaterEqual(avgCorrect, 80)
 
 

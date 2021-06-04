@@ -5,7 +5,7 @@ import sys
 import unittest
 
 script_path = os.path.dirname(os.path.abspath( __file__ ))
-src_dir = os.path.join(script_path, "..","src")
+src_dir = os.path.join(script_path, "..","src", "MCTSAntColony")
 sys.path.insert(1, src_dir)
 from TspGraph import TspGraph
 
