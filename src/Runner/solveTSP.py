@@ -37,7 +37,7 @@ sys.path.insert(1, Brute_dir)
 from BruteForce import brute_force_solution
 
 # MCTS Ant system
-Brute_dir = os.path.join(script_path, "..")
+Brute_dir = os.path.join(script_path, "..","MCTSAntColony")
 sys.path.insert(1, Brute_dir)
 from TspGraph import TspGraph
 

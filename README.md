@@ -45,11 +45,16 @@ Warning: This solution is both memory and computationally intensive, I would not
 
  script that runs each algorithm on a given data set and compares the results for items like avg optimal solution and average run time
 
+ With Brute Force
  ```bash
  ./src/Runner/algoCompare.py --filename TSPData/pcb10_test.tsp
-```
-Warning: This run brute force, and is not reccomended for graphs over 12 nodes
+ ```
+ Warning: This run brute force, and is not reccomended for graphs over 12 nodes
 
+ Without Brute Force
+ ```bash
+ ./src/Runner/algoCompare.py --filename TSPData/pcb10_test.tsp --noBrute
+ ```
 ## testing
 
 To run project unit test run 
